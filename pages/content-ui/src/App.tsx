@@ -91,47 +91,45 @@ export default function App() {
     <div ref={refs.setFloating} style={floatingStyles}>
       <PopoverPrimitive.Root open={isOpen} onOpenChange={setOpen}>
         <PopoverPrimitive.Anchor />
-        <PopoverPrimitive.Portal>
-          <PopoverPrimitive.Content className="animate-fade-in rounded-lg bg-white p-4 shadow-lg" sideOffset={5}>
-            <MergeRequestCard
-              title="feat: Add user authentication system"
-              description="This merge request implements a comprehensive user authentication system using JWT tokens. It includes login, registration, and password reset functionality."
-              author={{
-                name: 'Sarah Chen',
-                avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-              }}
-              sourceBranch="feature/auth-system"
-              targetBranch="main"
-              createdAt="2 hours ago"
-              commentsCount={5}
-              status={'open'}
-              pipeline={{
-                status: 'success',
-              }}
-              approvals={{
-                approvers: [
-                  {
-                    name: 'John Doe',
-                    avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400',
-                  },
-                  {
-                    name: 'Alice Smith',
-                    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
-                  },
-                ],
-                required: 2,
-              }}
-              canMerge={false}
-              mergeBlockers={[
-                'Pipeline is still running',
-                'Requires 2 approvals (1 more needed)',
-                'Branch is out of date',
-              ]}
-              onMerge={handleMerge}
-              onClose={handleClose}
-            />
-          </PopoverPrimitive.Content>
-        </PopoverPrimitive.Portal>
+        <PopoverPrimitive.Content className="animate-fade-in rounded-lg bg-white p-4 shadow-lg" sideOffset={5}>
+          <MergeRequestCard
+            title="feat: Add user authentication system"
+            description="This merge request implements a comprehensive user authentication system using JWT tokens. It includes login, registration, and password reset functionality."
+            author={{
+              name: 'Sarah Chen',
+              avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+            }}
+            sourceBranch="feature/auth-system"
+            targetBranch="main"
+            createdAt="2 hours ago"
+            commentsCount={5}
+            status={'open'}
+            pipeline={{
+              status: 'success',
+            }}
+            approvals={{
+              approvers: [
+                {
+                  name: 'John Doe',
+                  avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400',
+                },
+                {
+                  name: 'Alice Smith',
+                  avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
+                },
+              ],
+              required: 2,
+            }}
+            canMerge={false}
+            mergeBlockers={[
+              'Pipeline is still running',
+              'Requires 2 approvals (1 more needed)',
+              'Branch is out of date',
+            ]}
+            onMerge={handleMerge}
+            onClose={handleClose}
+          />
+        </PopoverPrimitive.Content>
       </PopoverPrimitive.Root>
     </div>
   );

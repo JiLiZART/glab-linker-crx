@@ -470,6 +470,9 @@ importers:
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
+      postcss-load-config:
+        specifier: ^6.0.1
+        version: 6.0.1(postcss@8.4.47)
 
   pages/devtools:
     dependencies:
