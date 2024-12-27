@@ -41,7 +41,7 @@ export default withUI({
 Add the following to the `index.tsx` file.
 
 ```tsx
-import '@extension/ui/dist/global.css';
+import '@extension/ui/global.css';
 ```
 
 ## Add Component
@@ -157,7 +157,7 @@ export function withUI(tailwindConfig: Config): Config {
   return deepmerge(
     shadcnConfig,
     deepmerge(tailwindConfig, {
-      content: ['./node_modules/@extension/ui/lib/**/*.{tsx,ts,js,jsx}'],
+      content: ['./node_modules/@extension/ui/**/*.{tsx,ts,js,jsx}'],
     }),
   );
 }

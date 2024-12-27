@@ -30,6 +30,9 @@
     "update-version": "bash update_version.sh"
   },
   "dependencies": {
+    "@radix-ui/react-popover": "^1.1.2",
+    "@radix-ui/themes": "^3.1.6",
+    "@floating-ui/react": "0.27.2",
     "eslint-plugin-tailwindcss": "^3.17.4",
     "react": "18.3.1",
     "react-dom": "18.3.1"

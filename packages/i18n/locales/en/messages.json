@@ -1,11 +1,11 @@
 {
   "extensionDescription": {
-    "description": "Extension description",
-    "message": "Chrome extension boilerplate developed with Vite, React and Typescript"
+    "description": "Gitlab Merge Requests extension",
+    "message": "Chrome extension to manage Gitlab Merge Requests in any page"
   },
   "extensionName": {
     "description": "Extension name",
-    "message": "Chrome extension boilerplate"
+    "message": "Gitlab Merge Requests linker"
   },
   "toggleTheme": {
     "message": "Toggle theme"
