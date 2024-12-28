@@ -1,82 +1,31 @@
 import { useEffect, useRef, useState } from 'react';
-import { useClientPoint, useInteractions, useFloating, offset, shift, flip, arrow } from '@floating-ui/react';
+import { formatRelative } from 'date-fns';
+import {
+  useInteractions,
+  useFloating,
+  offset,
+  shift,
+  flip,
+  autoUpdate,
+  useClick,
+  useDismiss,
+  useRole,
+  FloatingFocusManager,
+} from '@floating-ui/react';
 import { gitlabTokenStorage } from '@extension/storage';
 import { GitLabService } from './services/gitlabService';
 import { MergeRequestCard } from './components/merge-request/MergeRequestCard';
 import type { MergeRequestData } from './types';
-import { PopoverPortal, PopoverContent, Popover, PopoverAnchor } from '@extension/ui';
-import * as PopoverPrimitive from '@radix-ui/react-popover';
+
+const GITLAB_HOST = 'gitlab.com';
 
 async function gitlabFactory() {
   const token = await gitlabTokenStorage.get();
   return new GitLabService(token);
 }
 
-function transformMRData(data: MergeRequestData) {
-  /*
-  title: string;
-  description: string;
-  author: {
-    name: string;
-    avatar: string;
-  };
-  sourceBranch: string;
-  targetBranch: string;
-  createdAt: string;
-  commentsCount: number;
-  status: 'open' | 'merged' | 'closed' | string;
-  pipeline: {
-    status: 'running' | 'success' | 'failed' | 'pending';
-  };
-  approvals: {
-    approvers: Array<{ name: string; avatar: string }>;
-    required: number;
-  };
-  canMerge: boolean;
-  mergeBlockers?: string[];
-  */
-  return {
-    title: data.title,
-    description: data.description,
-    author: {
-      name: data.author.name,
-      avatar: data.author.avatar_url,
-    },
-    sourceBranch: data.source_branch,
-    targetBranch: data.target_branch,
-    createdAt: data.created_at,
-    commentsCount: data.changes_count,
-    canMerge: data.user.can_merge,
-  };
-}
-
-type MRInfo = ReturnType<typeof transformMRData>;
-
-export default function App() {
+function useGitlab() {
   const gitlabRef = useRef<GitLabService | null>(null);
-  const [isOpen, setOpen] = useState(false);
-  const [isLoading, setLoading] = useState(false);
-  const [mrInfo, setMrInfo] = useState<MRInfo | null>(null);
-
-  const arrowRef = useRef(null);
-
-  const { refs, floatingStyles, context, middlewareData, ...restProps } = useFloating({
-    placement: 'bottom',
-    middleware: [
-      offset(8), // отступ от референса
-      flip(), // переворачивает попап если не хватает места
-      shift(), // сдвигает попап если не хватает места
-      arrow({ element: arrowRef }), // позиционирует стрелку
-    ],
-  });
-
-  const { arrow: { x: arrowX, y: arrowY } = {} } = middlewareData;
-
-  const clientPoint = useClientPoint(context);
-
-  const { getReferenceProps, getFloatingProps } = useInteractions([clientPoint]);
-
-  // console.log({ refs, floatingStyles, restProps, refProps: getReferenceProps(), floatingProps: getFloatingProps() });
 
   useEffect(() => {
     gitlabFactory().then(gitlab => {
@@ -84,81 +33,116 @@ export default function App() {
     });
   }, []);
 
+  return gitlabRef.current;
+}
+
+function transformMRData(data: MergeRequestData) {
+  return {
+    projectId: data.project_id,
+    iid: data.iid,
+    title: data.title || '',
+    description: data.description,
+    author: {
+      name: data.author.name,
+      avatar: data.author.avatar_url,
+    },
+    pipeline: {
+      status: data.pipeline.status,
+    },
+    status: data.state,
+    sourceBranch: data.source_branch,
+    targetBranch: data.target_branch,
+    updatedAt: formatRelative(data.updated_at, new Date()),
+    changesCount: data.changes_count,
+    isDraft: data.draft,
+    isInProgress: data.work_in_progress,
+    hasConflicts: data.has_conflicts,
+    canMerge: data.user.can_merge && data.merge_status === 'can_be_merged',
+    // approvals: {
+    //   approvers: [
+    //     {
+    //       name: 'John Doe',
+    //       avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400',
+    //     },
+    //     {
+    //       name: 'Alice Smith',
+    //       avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
+    //     },
+    //   ],
+    //   required: 2,
+    // },
+    // mergeBlockers: ['Pipeline is still running', 'Requires 2 approvals (1 more needed)', 'Branch is out of date'],
+  };
+}
+
+type MRInfo = ReturnType<typeof transformMRData>;
+
+export default function App() {
+  const gitlab = useGitlab();
+  const [isOpen, setOpen] = useState(false);
+  const [mrInfo, setMrInfo] = useState<MRInfo | null>(null);
+
+  const { refs, floatingStyles, context } = useFloating({
+    open: isOpen,
+    onOpenChange: setOpen,
+    middleware: [offset(10), flip(), shift()],
+    whileElementsMounted: autoUpdate,
+  });
+
+  const click = useClick(context);
+  const dismiss = useDismiss(context);
+  const role = useRole(context);
+
+  // Merge all the interactions into prop getters
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
+
   useEffect(() => {
     const handleOpenPopover = async (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const link = target.closest('a');
 
-      console.log({ link });
-
-      if (link?.href && link.href.includes('gitlab.com') && link.href.includes('/merge_requests/')) {
+      if (link?.href && link.href.includes(GITLAB_HOST) && link.href.includes('/merge_requests/')) {
         refs.setReference(link);
-        setLoading(true);
-        const mrData = await gitlabRef.current?.getMRByUrl(link.href);
-        console.log({ mrData });
-        debugger;
-        setLoading(false);
-        setMrInfo(transformMRData(mrData));
-        // setMrUrl(link.href);
+        link.style.cursor = 'wait';
+        Object.entries(getReferenceProps()).forEach(([key, value]) => {
+          if (key.startsWith('aria-')) {
+            link.setAttribute(key, value as string);
+          }
+        });
 
+        const mrData = await gitlab?.getMRByUrl(link.href);
+
+        link.style.cursor = '';
+        setMrInfo(transformMRData(mrData));
         setOpen(true);
       }
     };
 
     document.addEventListener('mouseover', handleOpenPopover);
     return () => document.removeEventListener('mouseover', handleOpenPopover);
-  }, [refs]);
+  }, [refs, getReferenceProps, gitlab]);
 
   const handleMerge = async () => {
-    // TODO: Implement merge logic
-    console.log('Merging:');
+    if (mrInfo && gitlab) {
+      await gitlab.mergeMR(mrInfo.projectId, mrInfo.iid);
+    }
   };
 
   const handleClose = async () => {
-    // TODO: Implement close logic
-    console.log('Closing:');
+    if (mrInfo && gitlab) {
+      await gitlab?.closeMR(mrInfo.projectId, mrInfo.iid);
+    }
   };
 
-  // Popover.Content className="animate-fade-in rounded-lg bg-white p-4 shadow-lg"
+  if (isOpen && mrInfo) {
+    return (
+      <FloatingFocusManager context={context} modal={false}>
+        <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
+          <MergeRequestCard {...mrInfo} onMerge={handleMerge} onClose={handleClose} />
+        </div>
+      </FloatingFocusManager>
+    );
+  }
 
-  return (
-    <div ref={refs.setFloating} style={floatingStyles}>
-      {isOpen && (
-        <MergeRequestCard
-          title="feat: Add user authentication system"
-          description="This merge request implements a comprehensive user authentication system using JWT tokens. It includes login, registration, and password reset functionality."
-          author={{
-            name: 'Sarah Chen',
-            avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-          }}
-          sourceBranch="feature/auth-system"
-          targetBranch="main"
-          createdAt="2 hours ago"
-          commentsCount={5}
-          status={'open'}
-          pipeline={{
-            status: 'success',
-          }}
-          approvals={{
-            approvers: [
-              {
-                name: 'John Doe',
-                avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400',
-              },
-              {
-                name: 'Alice Smith',
-                avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
-              },
-            ],
-            required: 2,
-          }}
-          canMerge={false}
-          mergeBlockers={['Pipeline is still running', 'Requires 2 approvals (1 more needed)', 'Branch is out of date']}
-          {...mrInfo}
-          onMerge={handleMerge}
-          onClose={handleClose}
-        />
-      )}
-    </div>
-  );
+  return null;
 }

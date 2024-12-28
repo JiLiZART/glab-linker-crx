@@ -46,11 +46,11 @@ export class GitLabService {
     return this.makeRequest(mrToApiUrl(url), 'GET');
   }
 
-  async mergeMR(projectId: string, mrIid: string) {
+  async mergeMR(projectId: string | number, mrIid: string | number) {
     return this.makeRequest(`/projects/${projectId}/merge_requests/${mrIid}/merge`, 'PUT');
   }
 
-  async closeMR(projectId: string, mrIid: string) {
+  async closeMR(projectId: string | number, mrIid: string | number) {
     return this.makeRequest(`/projects/${projectId}/merge_requests/${mrIid}`, 'PUT', { state_event: 'close' });
   }
 }
