@@ -1,10 +1,28 @@
 const GITLAB_API_BASE = 'https://gitlab.com/api/v4';
 
+function mrToApiUrl(mrUrl: string) {
+  // Extract project path and MR ID from the URL
+  const urlPattern = /https:\/\/gitlab\.com\/(.+?)\/-\/merge_requests\/(\d+)/;
+  const match = mrUrl.match(urlPattern);
+
+  if (!match) {
+    throw new Error('Invalid Merge Request URL format.');
+  }
+
+  const projectPath = match[1];
+  const mergeRequestId = match[2];
+
+  // Construct the API URL
+  return `/projects/${encodeURIComponent(projectPath)}/merge_requests/${mergeRequestId}`;
+}
+
 export class GitLabService {
   private token: string;
+  private baseUrl: string;
 
-  constructor(token: string) {
+  constructor(token: string, baseUrl?: string) {
     this.token = token;
+    this.baseUrl = baseUrl || GITLAB_API_BASE;
   }
 
   private async makeRequest(endpoint: string, method: string, body?: any) {
@@ -22,6 +40,10 @@ export class GitLabService {
     }
 
     return response.json();
+  }
+
+  async getMRByUrl(url: string) {
+    return this.makeRequest(mrToApiUrl(url), 'GET');
   }
 
   async mergeMR(projectId: string, mrIid: string) {

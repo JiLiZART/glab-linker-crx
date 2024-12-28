@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { Children, forwardRef } from 'react';
 import {
   Card,
   CardContent,
@@ -53,6 +53,24 @@ interface MergeRequestCardProps {
   onClose?: () => void;
 }
 
+type TooltipWrapperProps = {
+  children: React.ReactNode;
+  text: React.ReactNode;
+};
+
+function TooltipWrapper(props: TooltipWrapperProps) {
+  const { children, text } = props;
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
+        <TooltipContent>{text}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
 export const MergeRequestCard = forwardRef<HTMLDivElement, MergeRequestCardProps>(
   (props: MergeRequestCardProps, ref) => {
     const {
@@ -79,26 +97,23 @@ export const MergeRequestCard = forwardRef<HTMLDivElement, MergeRequestCardProps
 
     const renderMergeButton = () => {
       if (!canMerge) {
+        const text = (
+          <ul className="list-disc pl-4">
+            {mergeBlockers.map((blocker, i) => (
+              <li key={i}>{blocker}</li>
+            ))}
+          </ul>
+        );
+
         return (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div>
-                  <Button className="flex-1" disabled>
-                    <AlertCircleIcon className="mr-2 size-4" />
-                    Cannot merge
-                  </Button>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <ul className="list-disc pl-4">
-                  {mergeBlockers.map((blocker, i) => (
-                    <li key={i}>{blocker}</li>
-                  ))}
-                </ul>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <TooltipWrapper text={text}>
+            <div>
+              <Button className="flex-1" disabled>
+                <AlertCircleIcon className="mr-2 size-4" />
+                Cannot merge
+              </Button>
+            </div>
+          </TooltipWrapper>
         );
       }
 
@@ -134,14 +149,17 @@ export const MergeRequestCard = forwardRef<HTMLDivElement, MergeRequestCardProps
           <p className="text-muted-foreground text-left text-sm">{description}</p>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="flex items-center gap-1.5">
+            <GitBranchIcon className="size-4" />
+            <TooltipWrapper text={sourceBranch}>
+              <span className="max-w-80 truncate font-mono">{sourceBranch}</span>
+            </TooltipWrapper>
+            <GitMergeIcon className="size-4 rotate-90" />
+            <TooltipWrapper text={targetBranch}>
+              <span className="max-w-80 truncate font-mono">{targetBranch}</span>
+            </TooltipWrapper>
+          </div>
           <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-1.5">
-              <GitBranchIcon className="size-4" />
-              <span className="font-mono">{sourceBranch}</span>
-              <GitMergeIcon className="size-4 rotate-90" />
-              <span className="font-mono">{targetBranch}</span>
-            </div>
-            <Separator orientation="vertical" className="h-4" />
             <div className="flex items-center gap-1.5">
               <ClockIcon className="size-4" />
               <span>{createdAt}</span>
@@ -149,7 +167,7 @@ export const MergeRequestCard = forwardRef<HTMLDivElement, MergeRequestCardProps
             <Separator orientation="vertical" className="h-4" />
             <div className="flex items-center gap-1.5">
               <MessageCircleIcon className="size-4" />
-              <span>{commentsCount} comments</span>
+              <span>{commentsCount} changes</span>
             </div>
           </div>
           <Approvals approvers={approvals.approvers} requiredApprovals={approvals.required} />

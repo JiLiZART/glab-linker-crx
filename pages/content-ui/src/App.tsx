@@ -3,7 +3,7 @@ import { useClientPoint, useInteractions, useFloating, offset, shift, flip, arro
 import { gitlabTokenStorage } from '@extension/storage';
 import { GitLabService } from './services/gitlabService';
 import { MergeRequestCard } from './components/merge-request/MergeRequestCard';
-import type { MergeRequestInfo } from './types';
+import type { MergeRequestData } from './types';
 import { PopoverPortal, PopoverContent, Popover, PopoverAnchor } from '@extension/ui';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 
@@ -12,26 +12,53 @@ async function gitlabFactory() {
   return new GitLabService(token);
 }
 
+function transformMRData(data: MergeRequestData) {
+  /*
+  title: string;
+  description: string;
+  author: {
+    name: string;
+    avatar: string;
+  };
+  sourceBranch: string;
+  targetBranch: string;
+  createdAt: string;
+  commentsCount: number;
+  status: 'open' | 'merged' | 'closed' | string;
+  pipeline: {
+    status: 'running' | 'success' | 'failed' | 'pending';
+  };
+  approvals: {
+    approvers: Array<{ name: string; avatar: string }>;
+    required: number;
+  };
+  canMerge: boolean;
+  mergeBlockers?: string[];
+  */
+  return {
+    title: data.title,
+    description: data.description,
+    author: {
+      name: data.author.name,
+      avatar: data.author.avatar_url,
+    },
+    sourceBranch: data.source_branch,
+    targetBranch: data.target_branch,
+    createdAt: data.created_at,
+    commentsCount: data.changes_count,
+    canMerge: data.user.can_merge,
+  };
+}
+
+type MRInfo = ReturnType<typeof transformMRData>;
+
 export default function App() {
   const gitlabRef = useRef<GitLabService | null>(null);
   const [isOpen, setOpen] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const [mrInfo, setMrInfo] = useState<MergeRequestInfo | null>(null);
+  const [mrInfo, setMrInfo] = useState<MRInfo | null>(null);
 
   const arrowRef = useRef(null);
-
-  const fetchMRInfo = async () => {
-    // TODO: Implement actual API call
-    setTimeout(() => {
-      setMrInfo({
-        title: 'Example MR Title',
-        pipelineStatus: 'success',
-        author: 'John Doe',
-        updatedAt: '2024-01-20T10:00:00Z',
-      });
-      setLoading(false);
-    }, 1000);
-  };
 
   const { refs, floatingStyles, context, middlewareData, ...restProps } = useFloating({
     placement: 'bottom',
@@ -58,7 +85,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const handleOpenPopover = (e: MouseEvent) => {
+    const handleOpenPopover = async (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const link = target.closest('a');
 
@@ -66,7 +93,14 @@ export default function App() {
 
       if (link?.href && link.href.includes('gitlab.com') && link.href.includes('/merge_requests/')) {
         refs.setReference(link);
+        setLoading(true);
+        const mrData = await gitlabRef.current?.getMRByUrl(link.href);
+        console.log({ mrData });
+        debugger;
+        setLoading(false);
+        setMrInfo(transformMRData(mrData));
         // setMrUrl(link.href);
+
         setOpen(true);
       }
     };
@@ -120,6 +154,7 @@ export default function App() {
           }}
           canMerge={false}
           mergeBlockers={['Pipeline is still running', 'Requires 2 approvals (1 more needed)', 'Branch is out of date']}
+          {...mrInfo}
           onMerge={handleMerge}
           onClose={handleClose}
         />
