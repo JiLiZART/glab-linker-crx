@@ -37,6 +37,11 @@ function useGitlab() {
 }
 
 function transformMRData(data: MergeRequestData) {
+  if (!data) {
+    console.log('transformMRData', data);
+    return null;
+  }
+
   return {
     projectId: data.project_id,
     iid: data.iid,
@@ -101,20 +106,26 @@ export default function App() {
       const target = e.target as HTMLElement;
       const link = target.closest('a');
 
+      setMrInfo(null);
+
       if (link?.href && link.href.includes(GITLAB_HOST) && link.href.includes('/merge_requests/')) {
         refs.setReference(link);
         link.style.cursor = 'wait';
+
         Object.entries(getReferenceProps()).forEach(([key, value]) => {
           if (key.startsWith('aria-')) {
             link.setAttribute(key, value as string);
           }
         });
 
-        const mrData = await gitlab?.getMRByUrl(link.href);
+        if (gitlab) {
+          const mrData = await gitlab.getMRByUrl(link.href);
+          link.style.cursor = '';
+          const data = transformMRData(mrData);
 
-        link.style.cursor = '';
-        setMrInfo(transformMRData(mrData));
-        setOpen(true);
+          setMrInfo(data);
+          setOpen(true);
+        }
       }
     };
 
@@ -135,6 +146,7 @@ export default function App() {
   };
 
   if (isOpen && mrInfo) {
+    console.log({ mrInfo });
     return (
       <FloatingFocusManager context={context} modal={false}>
         <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>

@@ -32,7 +32,7 @@ interface MergeRequestCardProps {
   updatedAt: string;
   changesCount: number;
   hasConflicts: boolean;
-  status: 'open' | 'merged' | 'closed' | string;
+  status: 'opened' | 'merged' | 'closed' | string;
   isDraft?: boolean;
   pipeline: {
     status: 'running' | 'success' | 'failed' | 'pending' | string;
@@ -124,9 +124,9 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
           <BranchInfo sourceBranch={sourceBranch} targetBranch={targetBranch} />
           <MergeRequestStats changesCount={changesCount} hasConflicts={hasConflicts} createdAt={updatedAt} />
         </div>
-        <Approvals approvers={approvals.approvers} requiredApprovals={approvals.required} />
+        {approvals && <Approvals approvers={approvals?.approvers} requiredApprovals={approvals?.required} />}
       </CardContent>
-      {status === 'open' && (
+      {status === 'opened' && (
         <CardFooter className="gap-2">
           {renderMergeButton()}
           <Button onClick={onClose} variant="destructive" className="flex-1">

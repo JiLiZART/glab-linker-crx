@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { Badge, cn } from '@extension/ui';
 
 interface MergeRequestLabelsProps {
-  status: 'open' | 'merged' | 'closed';
+  status: 'open' | 'merged' | 'closed' | string;
   isDraft: boolean;
 }
 

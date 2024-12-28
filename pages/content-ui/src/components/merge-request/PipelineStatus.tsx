@@ -5,7 +5,7 @@ import { PlayCircle, CheckCircle2, XCircle } from 'lucide-react';
 type PipelineStatus = 'running' | 'success' | 'failed' | 'pending';
 
 interface PipelineStatusProps {
-  status: PipelineStatus;
+  status: PipelineStatus | string;
 }
 
 const statusConfig = {
