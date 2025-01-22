@@ -108,7 +108,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
     }
 
     return (
-      <Button className="flex-1" onClick={onMerge} disabled={!youCanMerge} variant="default">
+      <Button className="flex-1" onClick={onMerge} variant="default">
         <CheckIcon className="mr-2 size-4" />
         Merge
       </Button>
@@ -146,10 +146,10 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
         </div>
         {approvals && <Approvals approvers={approvals?.approvers} requiredApprovals={approvals?.required} />}
       </CardContent>
-      {status === 'opened' && (
+      {status === 'opened' && youCanMerge && (
         <CardFooter className="gap-2">
           {renderMergeButton()}
-          <Button onClick={onClose} disabled={!youCanMerge} variant="destructive" className="flex-1">
+          <Button onClick={onClose} variant="destructive" className="flex-1">
             <XIcon className="mr-2 size-4" />
             Close
           </Button>

@@ -169,11 +169,17 @@ export default function App() {
       const mrData = await gitlab.getMRByUrl(link.href).catch(err => {
         console.log('gitlab.getMRByUrl', err);
       });
+
+      link.style.cursor = '';
+
+      if (!mrData) {
+        console.error('glab-linker-crx: failed to fetch MR info');
+        return;
+      }
+
       const reviewApp = await gitlab.getMRReviewApp(mrData?.pipeline?.project_id, mrData?.pipeline?.ref).catch(err => {
         console.log('gitlab.getMRReviewApp', err);
       });
-
-      link.style.cursor = '';
 
       const data = transformMRData(mrData, reviewApp);
 

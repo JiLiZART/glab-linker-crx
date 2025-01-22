@@ -70,4 +70,4 @@ const Options = () => {
   );
 };
 
-export default withErrorBoundary(withSuspense(Options, <div>Загрузка...</div>), <div>Произошла ошибка</div>);
+export default withErrorBoundary(withSuspense(Options, <div>Loading...</div>), <div>Error occurred</div>);

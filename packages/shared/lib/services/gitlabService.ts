@@ -21,7 +21,7 @@ function mrToApiUrl(hostname: string, mrUrl: string) {
   const mergeRequestId = match[2];
 
   // Construct the API URL
-  return `/projects/${encodeURIComponent(projectPath)}/merge_requests/${mergeRequestId}`;
+  return `projects/${encodeURIComponent(projectPath)}/merge_requests/${mergeRequestId}`;
 }
 
 export class GitLabService {
@@ -29,6 +29,10 @@ export class GitLabService {
   private baseUrl: string;
 
   constructor(token: string, baseUrl?: string) {
+    if (!token) {
+      throw new Error('GitLab token is required');
+    }
+
     this.token = token;
     this.baseUrl = baseUrl || GITLAB_BASE;
   }
@@ -56,7 +60,7 @@ export class GitLabService {
   }
 
   async getMREnvironments(projectId: string | number, ref: string) {
-    return this.api(`/projects/${projectId}/environments?search=${encodeURIComponent(ref)}`, 'GET');
+    return this.api(`projects/${projectId}/environments?search=${encodeURIComponent(ref)}`, 'GET');
   }
 
   async getMRByUrl(url: string) {
@@ -70,10 +74,10 @@ export class GitLabService {
   }
 
   async mergeMR(projectId: string | number, mrIid: string | number) {
-    return this.api(`/projects/${projectId}/merge_requests/${mrIid}/merge`, 'PUT');
+    return this.api(`projects/${projectId}/merge_requests/${mrIid}/merge`, 'PUT');
   }
 
   async closeMR(projectId: string | number, mrIid: string | number) {
-    return this.api(`/projects/${projectId}/merge_requests/${mrIid}`, 'PUT', { state_event: 'close' });
+    return this.api(`projects/${projectId}/merge_requests/${mrIid}`, 'PUT', { state_event: 'close' });
   }
 }

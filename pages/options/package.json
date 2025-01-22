@@ -1,7 +1,7 @@
 {
   "name": "@extension/options",
   "version": "0.3.4",
-  "description": "chrome extension - options",
+  "description": "Gitlab Linker Options",
   "private": true,
   "sideEffects": true,
   "files": [
