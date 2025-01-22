@@ -29,7 +29,7 @@ const statusConfig = {
     className: 'bg-yellow-500/10 text-yellow-500',
     label: 'Pipeline pending',
   },
-} as Record<PipelineStatus, { icon: FC; className: string; label: string }>;
+} as Record<PipelineStatus, { icon: FC<{ className: string }>; className: string; label: string }>;
 
 export const PipelineStatus: FC<PipelineStatusProps> = ({ status }) => {
   const { icon: Icon, className, label } = statusConfig[status as string];

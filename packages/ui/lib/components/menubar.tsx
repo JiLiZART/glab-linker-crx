@@ -4,7 +4,7 @@ import * as MenubarPrimitive from '@radix-ui/react-menubar';
 
 import { cn } from '.';
 
-const MenubarMenu = MenubarPrimitive.Menu;
+// const MenubarMenu = MenubarPrimitive.Menu;
 
 const MenubarGroup = MenubarPrimitive.Group;
 
@@ -16,7 +16,7 @@ const MenubarRadioGroup = MenubarPrimitive.RadioGroup;
 
 const Menubar = React.forwardRef<
   React.ElementRef<typeof MenubarPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Root>
+  React.ComponentPropsWithoutRef<typeof MenubarPrimitive.Root> & { className: string }
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.Root
     ref={ref}
@@ -186,7 +186,7 @@ MenubarShortcut.displayname = 'MenubarShortcut';
 
 export {
   Menubar,
-  MenubarMenu,
+  // MenubarMenu,
   MenubarTrigger,
   MenubarContent,
   MenubarItem,
