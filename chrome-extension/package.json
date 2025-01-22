@@ -1,7 +1,7 @@
 {
-  "name": "chrome-extension",
-  "version": "0.3.4",
-  "description": "chrome extension - core settings",
+  "name": "glab-linker-crx",
+  "version": "1.0.2",
+  "description": "Show preview of GitLab merge requests",
   "type": "module",
   "scripts": {
     "clean:node_modules": "pnpx rimraf node_modules",

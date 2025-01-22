@@ -35,6 +35,7 @@ interface MergeRequestCardProps {
   hasConflicts: boolean;
   status: 'opened' | 'merged' | 'closed' | string;
   isDraft?: boolean;
+  isInProgress?: boolean;
   pipeline: {
     status: 'running' | 'success' | 'failed' | 'pending' | string;
   };
@@ -43,11 +44,12 @@ interface MergeRequestCardProps {
     required: number;
   };
   canMerge: boolean;
+  youCanMerge?: boolean;
   mergeBlockers?: string[];
   reviewApp?: {
     url?: string;
     slug?: string;
-    state: string;
+    state?: string;
   };
   onMerge?: () => Promise<void>;
   onClose?: () => Promise<void>;
@@ -64,9 +66,11 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
   hasConflicts,
   status,
   isDraft = false,
+  isInProgress = false,
   pipeline,
   approvals,
   canMerge,
+  youCanMerge,
   reviewApp = {},
   mergeBlockers = [],
   onMerge,
@@ -104,7 +108,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
     }
 
     return (
-      <Button className="flex-1" onClick={onMerge} variant="default">
+      <Button className="flex-1" onClick={onMerge} disabled={!youCanMerge} variant="default">
         <CheckIcon className="mr-2 size-4" />
         Merge
       </Button>
@@ -130,7 +134,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
               <ReviewAppButton state={reviewApp?.state} url={reviewApp?.url} slug={reviewApp?.slug} />
             )}
             <PipelineStatus status={pipeline.status} />
-            <MergeRequestLabels status={status} isDraft={isDraft} />
+            <MergeRequestLabels status={status} isDraft={isDraft} isInProgress={isInProgress} />
           </div>
         </div>
         <p className="text-muted-foreground text-sm">{description}</p>
@@ -145,7 +149,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
       {status === 'opened' && (
         <CardFooter className="gap-2">
           {renderMergeButton()}
-          <Button onClick={onClose} variant="destructive" className="flex-1">
+          <Button onClick={onClose} disabled={!youCanMerge} variant="destructive" className="flex-1">
             <XIcon className="mr-2 size-4" />
             Close
           </Button>

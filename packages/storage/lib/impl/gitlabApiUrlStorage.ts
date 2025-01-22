@@ -6,7 +6,7 @@ type GitlabApiUrlStorage = BaseStorage<string> & {
   setUrl: (val: string) => Promise<void>;
 };
 
-const storage = createStorage<string>('gitlab-api-url', 'https://gitlab.com/api/v4', {
+const storage = createStorage<string>('gitlab-url', 'https://gitlab.com', {
   storageEnum: StorageEnum.Local,
   liveUpdate: true,
 });

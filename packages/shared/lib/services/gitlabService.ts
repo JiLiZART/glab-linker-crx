@@ -1,4 +1,4 @@
-export const GITLAB_API_BASE = 'https://gitlab.com/api/v4';
+export const GITLAB_BASE = 'https://gitlab.com';
 
 // const hostname = 'gitlab.bitmware.com';
 // const urlPattern = new RegExp(`https://${hostname}/(.+?)/-/merge_requests/(\d+)`);
@@ -30,11 +30,11 @@ export class GitLabService {
 
   constructor(token: string, baseUrl?: string) {
     this.token = token;
-    this.baseUrl = baseUrl || GITLAB_API_BASE;
+    this.baseUrl = baseUrl || GITLAB_BASE;
   }
 
   private async api(endpoint: string, method: string, body?: Record<string, unknown>) {
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+    const response = await fetch(`${this.baseUrl}/api/v4/${endpoint}`, {
       method,
       headers: {
         Authorization: `Bearer ${this.token}`,

@@ -7,7 +7,7 @@ export const ApiUrlInput = () => {
   return (
     <div className="mb-6">
       <label className="mb-2 block text-sm font-medium text-gray-700" htmlFor="apiUrl">
-        API BASE URL
+        Gitlab Instance Url
       </label>
       <input
         {...register('apiUrl')}

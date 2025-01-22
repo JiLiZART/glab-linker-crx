@@ -81,7 +81,8 @@ function transformMRData(data: MergeRequestData, envData?: Environment) {
     isDraft: data.draft,
     isInProgress: data.work_in_progress,
     hasConflicts: data.has_conflicts,
-    canMerge: data.user.can_merge && data.merge_status === 'can_be_merged',
+    canMerge: data.merge_status === 'can_be_merged',
+    youCanMerge: data.user.can_merge,
     reviewApp: envData ? reviewApp : undefined,
     // approvals: {
     //   approvers: [
