@@ -33,7 +33,7 @@ export class GitLabService {
     this.baseUrl = baseUrl || GITLAB_API_BASE;
   }
 
-  private async makeRequest(endpoint: string, method: string, body?: Record<string, unknown>) {
+  private async api(endpoint: string, method: string, body?: Record<string, unknown>) {
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       method,
       headers: {
@@ -55,15 +55,25 @@ export class GitLabService {
     return url.hostname;
   }
 
+  async getMREnvironments(projectId: string | number, ref: string) {
+    return this.api(`/projects/${projectId}/environments?search=${encodeURIComponent(ref)}`, 'GET');
+  }
+
   async getMRByUrl(url: string) {
-    return this.makeRequest(mrToApiUrl(this.getApiHostname(), url), 'GET');
+    return this.api(mrToApiUrl(this.getApiHostname(), url), 'GET');
+  }
+
+  async getMRReviewApp(projectId: string | number, ref: string) {
+    const envs = await this.getMREnvironments(projectId, ref);
+
+    return envs.find((env: { external_url?: string }) => env.external_url);
   }
 
   async mergeMR(projectId: string | number, mrIid: string | number) {
-    return this.makeRequest(`/projects/${projectId}/merge_requests/${mrIid}/merge`, 'PUT');
+    return this.api(`/projects/${projectId}/merge_requests/${mrIid}/merge`, 'PUT');
   }
 
   async closeMR(projectId: string | number, mrIid: string | number) {
-    return this.makeRequest(`/projects/${projectId}/merge_requests/${mrIid}`, 'PUT', { state_event: 'close' });
+    return this.api(`/projects/${projectId}/merge_requests/${mrIid}`, 'PUT', { state_event: 'close' });
   }
 }

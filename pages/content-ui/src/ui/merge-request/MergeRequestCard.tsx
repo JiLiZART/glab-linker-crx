@@ -19,6 +19,7 @@ import { Approvals } from './Approvals';
 import { BranchInfo } from './BranchInfo';
 import { MergeRequestStats } from './MergeRequestStats';
 import { MergeRequestLabels } from './MergeRequestLabels';
+import { ReviewAppButton } from './ReviewAppButton';
 
 interface MergeRequestCardProps {
   title: string;
@@ -43,6 +44,11 @@ interface MergeRequestCardProps {
   };
   canMerge: boolean;
   mergeBlockers?: string[];
+  reviewApp?: {
+    url?: string;
+    slug?: string;
+    state: string;
+  };
   onMerge?: () => Promise<void>;
   onClose?: () => Promise<void>;
 }
@@ -61,33 +67,40 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
   pipeline,
   approvals,
   canMerge,
+  reviewApp = {},
   mergeBlockers = [],
   onMerge,
   onClose,
 }) => {
   const renderMergeButton = () => {
     if (!canMerge) {
-      return (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div>
-                <Button className="flex-1" disabled>
-                  <AlertCircleIcon className="mr-2 size-4" />
-                  Cannot merge
-                </Button>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <ul className="list-disc pl-4">
-                {mergeBlockers.map((blocker, i) => (
-                  <li key={i}>{blocker}</li>
-                ))}
-              </ul>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+      const button = (
+        <div>
+          <Button className="flex-1" disabled>
+            <AlertCircleIcon className="mr-2 size-4" />
+            Cannot merge
+          </Button>
+        </div>
       );
+
+      if (mergeBlockers?.length) {
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>{button}</TooltipTrigger>
+              <TooltipContent>
+                <ul className="list-disc pl-4">
+                  {mergeBlockers.map((blocker, i) => (
+                    <li key={i}>{blocker}</li>
+                  ))}
+                </ul>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      }
+
+      return button;
     }
 
     return (
@@ -101,7 +114,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
   return (
     <Card className="w-full max-w-2xl transition-all hover:shadow-lg">
       <CardHeader className="space-y-4">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col items-start gap-4">
           <div className="flex items-center gap-2">
             <Avatar className="border-background size-10 border-2">
               <AvatarImage src={author.avatar} alt={author.name} />
@@ -113,6 +126,9 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {reviewApp?.url && reviewApp?.slug && reviewApp?.state && status !== 'merged' && (
+              <ReviewAppButton state={reviewApp?.state} url={reviewApp?.url} slug={reviewApp?.slug} />
+            )}
             <PipelineStatus status={pipeline.status} />
             <MergeRequestLabels status={status} isDraft={isDraft} />
           </div>

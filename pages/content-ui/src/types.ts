@@ -159,3 +159,16 @@ export interface DiffRefs {
 export interface User2 {
   can_merge: boolean;
 }
+
+export interface Environment {
+  id: number;
+  name: string;
+  slug: string;
+  external_url: string;
+  created_at: string;
+  updated_at: string;
+  tier: string;
+  state: string | 'stopped';
+  auto_stop_at: string | null;
+  description: string | null;
+}

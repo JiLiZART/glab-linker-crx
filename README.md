@@ -52,3 +52,11 @@
 
 <p><i>Thank you for using Gitlab Linker!</i></p>
 
+
+### Roadmap
+* Tooltip behavior options
+* More than one gitlab instance support
+* Ignoring sites by pattern
+* Prefetch support (fetch all MR urls on page for instant view enabled via options)
+* Cache support, dont do fetching two times
+* Dark theme support

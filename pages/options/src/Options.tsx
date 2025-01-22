@@ -40,7 +40,7 @@ const Options = () => {
         onSubmit={methods.handleSubmit(onSubmit)}
         className="flex min-h-screen flex-col items-center bg-slate-50 p-8">
         <div className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-lg">
-          <h1 className="mb-6 text-2xl font-bold text-gray-800">GitLab Настройки</h1>
+          <h1 className="mb-6 text-2xl font-bold text-gray-800">Gitlab Linker Options</h1>
 
           <ApiUrlInput />
 
@@ -50,15 +50,14 @@ const Options = () => {
             <Button
               type="submit"
               className="rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none">
-              Сохранить
+              Save
             </Button>
-            {saved && <span className="text-sm font-medium text-green-500">Токен успешно сохранен!</span>}
+            {saved && <span className="text-sm font-medium text-green-500">Successfully saved!</span>}
           </div>
 
           <div className="mt-6 rounded-md bg-gray-50 p-4">
-            <h2 className="mb-2 text-sm font-medium text-gray-700">Необходимые разрешения для токена:</h2>
+            <h2 className="mb-2 text-sm font-medium text-gray-700">Required permission for token:</h2>
             <ul className="list-inside list-disc text-sm text-gray-600">
-              <li>api</li>
               <li>read_api</li>
               <li>read_user</li>
               <li>read_repository</li>

@@ -16,7 +16,7 @@ import { gitlabTokenStorage, gitlabApiUrlStorage } from '@extension/storage';
 import { GitLabService } from '@extension/shared';
 
 import { MergeRequestCard } from './ui/merge-request';
-import type { MergeRequestData } from './types';
+import type { MergeRequestData, Environment } from './types';
 
 async function gitlabFactory() {
   const token = await gitlabTokenStorage.get();
@@ -43,10 +43,22 @@ function useGitlab() {
   return loaded ? gitlabRef.current : null;
 }
 
-function transformMRData(data: MergeRequestData) {
+function transformMRData(data: MergeRequestData, envData?: Environment) {
   if (!data) {
     console.log('transformMRData', data);
     return null;
+  }
+
+  const reviewApp = {
+    url: envData?.external_url,
+    slug: envData?.slug,
+    state: envData?.state,
+  };
+
+  const mergeBlockers = [];
+
+  if (data?.merge_error) {
+    mergeBlockers.push(data.merge_error);
   }
 
   return {
@@ -70,6 +82,7 @@ function transformMRData(data: MergeRequestData) {
     isInProgress: data.work_in_progress,
     hasConflicts: data.has_conflicts,
     canMerge: data.user.can_merge && data.merge_status === 'can_be_merged',
+    reviewApp: envData ? reviewApp : undefined,
     // approvals: {
     //   approvers: [
     //     {
@@ -83,6 +96,8 @@ function transformMRData(data: MergeRequestData) {
     //   ],
     //   required: 2,
     // },
+
+    mergeBlockers,
     // mergeBlockers: ['Pipeline is still running', 'Requires 2 approvals (1 more needed)', 'Branch is out of date'],
   };
 }
@@ -134,10 +149,15 @@ export default function App() {
         return;
       }
 
+      if (globalThis.location.hostname == hostname) {
+        return;
+      }
+
       setMrInfo(null);
 
       refs.setReference(link);
       link.style.cursor = 'wait';
+      link.title = '';
 
       Object.entries(getReferenceProps()).forEach(([key, value]) => {
         if (key.startsWith('aria-')) {
@@ -148,10 +168,13 @@ export default function App() {
       const mrData = await gitlab.getMRByUrl(link.href).catch(err => {
         console.log('gitlab.getMRByUrl', err);
       });
-      link.style.cursor = '';
-      const data = transformMRData(mrData);
+      const reviewApp = await gitlab.getMRReviewApp(mrData?.pipeline?.project_id, mrData?.pipeline?.ref).catch(err => {
+        console.log('gitlab.getMRReviewApp', err);
+      });
 
-      console.log({ mrData });
+      link.style.cursor = '';
+
+      const data = transformMRData(mrData, reviewApp);
 
       setMrInfo(data);
       setOpen(true);
@@ -174,10 +197,12 @@ export default function App() {
   };
 
   if (isOpen && mrInfo) {
-    console.log({ mrInfo });
     return (
       <FloatingFocusManager context={context} modal={false}>
-        <div ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
+        <div
+          ref={refs.setFloating}
+          style={{ ...floatingStyles, zIndex: 9999, outline: 'none' }}
+          {...getFloatingProps()}>
           <MergeRequestCard {...mrInfo} onMerge={handleMerge} onClose={handleClose} />
         </div>
       </FloatingFocusManager>
