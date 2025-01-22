@@ -1,8 +1,16 @@
-const GITLAB_API_BASE = 'https://gitlab.com/api/v4';
+export const GITLAB_API_BASE = 'https://gitlab.com/api/v4';
 
-function mrToApiUrl(mrUrl: string) {
+// const hostname = 'gitlab.bitmware.com';
+// const urlPattern = new RegExp(`https://${hostname}/(.+?)/-/merge_requests/(\d+)`);
+
+// const url = 'https://gitlab.bitmware.com/hodl/content/debifi/debifi-akh-panel/-/merge_requests/2';
+
+// url.match(urlPattern);
+
+function mrToApiUrl(hostname: string, mrUrl: string) {
   // Extract project path and MR ID from the URL
-  const urlPattern = /https:\/\/gitlab\.com\/(.+?)\/-\/merge_requests\/(\d+)/;
+  // const urlPattern = /https:\/\/gitlab\.com\/(.+?)\/-\/merge_requests\/(\d+)/;
+  const urlPattern = new RegExp(`https://${hostname}/(.+?)/-/merge_requests/(\\d+)`);
   const match = mrUrl.match(urlPattern);
 
   if (!match) {
@@ -25,8 +33,8 @@ export class GitLabService {
     this.baseUrl = baseUrl || GITLAB_API_BASE;
   }
 
-  private async makeRequest(endpoint: string, method: string, body?: any) {
-    const response = await fetch(`${GITLAB_API_BASE}${endpoint}`, {
+  private async makeRequest(endpoint: string, method: string, body?: Record<string, unknown>) {
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
       method,
       headers: {
         Authorization: `Bearer ${this.token}`,
@@ -42,8 +50,13 @@ export class GitLabService {
     return response.json();
   }
 
+  getApiHostname() {
+    const url = new URL(this.baseUrl);
+    return url.hostname;
+  }
+
   async getMRByUrl(url: string) {
-    return this.makeRequest(mrToApiUrl(url), 'GET');
+    return this.makeRequest(mrToApiUrl(this.getApiHostname(), url), 'GET');
   }
 
   async mergeMR(projectId: string | number, mrIid: string | number) {

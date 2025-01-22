@@ -11,7 +11,7 @@ export const MergeRequestLabels: FC<MergeRequestLabelsProps> = ({ status, isDraf
     open: 'bg-blue-500/10 text-blue-500',
     merged: 'bg-green-500/10 text-green-500',
     closed: 'bg-red-500/10 text-red-500',
-  };
+  } as Record<string, string>;
 
   return (
     <div className="flex items-center gap-2">

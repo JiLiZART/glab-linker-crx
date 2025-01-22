@@ -12,28 +12,35 @@ import {
   useRole,
   FloatingFocusManager,
 } from '@floating-ui/react';
-import { gitlabTokenStorage } from '@extension/storage';
-import { GitLabService } from './services/gitlabService';
-import { MergeRequestCard } from './components/merge-request/MergeRequestCard';
-import type { MergeRequestData } from './types';
+import { gitlabTokenStorage, gitlabApiUrlStorage } from '@extension/storage';
+import { GitLabService } from '@extension/shared';
 
-const GITLAB_HOST = 'gitlab.com';
+import { MergeRequestCard } from './ui/merge-request';
+import type { MergeRequestData } from './types';
 
 async function gitlabFactory() {
   const token = await gitlabTokenStorage.get();
-  return new GitLabService(token);
+  const apiUrl = await gitlabApiUrlStorage.get();
+
+  return new GitLabService(token, apiUrl);
 }
 
 function useGitlab() {
   const gitlabRef = useRef<GitLabService | null>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    gitlabFactory().then(gitlab => {
-      gitlabRef.current = gitlab;
-    });
+    gitlabFactory()
+      .then(gitlab => {
+        gitlabRef.current = gitlab;
+        setLoaded(true);
+      })
+      .catch(err => {
+        console.log({ err });
+      });
   }, []);
 
-  return gitlabRef.current;
+  return loaded ? gitlabRef.current : null;
 }
 
 function transformMRData(data: MergeRequestData) {
@@ -105,28 +112,49 @@ export default function App() {
     const handleOpenPopover = async (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const link = target.closest('a');
+      const hostname = gitlab?.getApiHostname();
+
+      if (!gitlab) {
+        return;
+      }
+
+      if (!hostname) {
+        return;
+      }
+
+      if (!link?.href) {
+        return;
+      }
+
+      if (!link.href.includes(hostname)) {
+        return;
+      }
+
+      if (!link.href.includes('/merge_requests/')) {
+        return;
+      }
 
       setMrInfo(null);
 
-      if (link?.href && link.href.includes(GITLAB_HOST) && link.href.includes('/merge_requests/')) {
-        refs.setReference(link);
-        link.style.cursor = 'wait';
+      refs.setReference(link);
+      link.style.cursor = 'wait';
 
-        Object.entries(getReferenceProps()).forEach(([key, value]) => {
-          if (key.startsWith('aria-')) {
-            link.setAttribute(key, value as string);
-          }
-        });
-
-        if (gitlab) {
-          const mrData = await gitlab.getMRByUrl(link.href);
-          link.style.cursor = '';
-          const data = transformMRData(mrData);
-
-          setMrInfo(data);
-          setOpen(true);
+      Object.entries(getReferenceProps()).forEach(([key, value]) => {
+        if (key.startsWith('aria-')) {
+          link.setAttribute(key, value as string);
         }
-      }
+      });
+
+      const mrData = await gitlab.getMRByUrl(link.href).catch(err => {
+        console.log('gitlab.getMRByUrl', err);
+      });
+      link.style.cursor = '';
+      const data = transformMRData(mrData);
+
+      console.log({ mrData });
+
+      setMrInfo(data);
+      setOpen(true);
     };
 
     document.addEventListener('mouseover', handleOpenPopover);
@@ -141,7 +169,7 @@ export default function App() {
 
   const handleClose = async () => {
     if (mrInfo && gitlab) {
-      await gitlab?.closeMR(mrInfo.projectId, mrInfo.iid);
+      await gitlab.closeMR(mrInfo.projectId, mrInfo.iid);
     }
   };
 
