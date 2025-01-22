@@ -64,6 +64,10 @@ const SUPPORTED_LANGUAGES = {
 const locales = fs.readdirSync('locales');
 
 locales.forEach(locale => {
+  if (locale[0] === '.') {
+    return;
+  }
+
   if (!(locale in SUPPORTED_LANGUAGES)) {
     throw new Error(`Unsupported language: ${locale}`);
   }
