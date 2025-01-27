@@ -23,7 +23,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "lucide-react": "0.469.0",
+    "lucide-react": "0.474.0",
     "date-fns": "4.1.0",
     "@extension/shared": "workspace:*",
     "@extension/storage": "workspace:*",
