@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { GitCommitIcon, AlertTriangleIcon } from 'lucide-react';
-import { Badge, Separator, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@extension/ui';
+import { Badge, Separator, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../../index';
 
 interface MergeRequestStatsProps {
   changesCount: number;

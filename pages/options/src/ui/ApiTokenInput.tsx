@@ -3,8 +3,9 @@ import { useFormContext } from 'react-hook-form';
 export function ApiTokenInput() {
   const { register, watch } = useFormContext();
   const apiUrl = watch('apiUrl');
-  const hostname = new URL(apiUrl).hostname;
-  const url = `https://${hostname}/-/user_settings/personal_access_tokens`;
+  const hostname = apiUrl && apiUrl.startsWith('http') ? new URL(apiUrl).hostname : '';
+  const newUrl = `https://${hostname}/-/user_settings/personal_access_tokens`;
+  const oldUrl = `https://${hostname}/-/profile/personal_access_tokens`;
 
   return (
     <div className="mb-6">
@@ -21,9 +22,15 @@ export function ApiTokenInput() {
         You can get it in Avatar {'>'} Preferences {'>'} Access Tokens
         <br />
         {hostname && (
-          <a href={url} target="_blank" className="ml-1 text-blue-500" rel="noreferrer">
-            {url}
-          </a>
+          <>
+            <a href={newUrl} target="_blank" className="ml-1 text-blue-500" rel="noreferrer">
+              {newUrl}
+            </a>
+            {'or'}
+            <a href={oldUrl} target="_blank" className="ml-1 text-blue-500" rel="noreferrer">
+              {oldUrl}
+            </a>
+          </>
         )}
       </p>
     </div>

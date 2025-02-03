@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { Badge, cn } from '@extension/ui';
+import { Badge, cn } from '../../../../index';
 
 interface MergeRequestLabelsProps {
   status: 'open' | 'merged' | 'closed' | string;

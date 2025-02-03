@@ -1,4 +1,4 @@
-import { TooltipProvider, Tooltip, TooltipTrigger, Button, TooltipContent } from '@extension/ui';
+import { TooltipProvider, Tooltip, TooltipTrigger, Button, TooltipContent } from '../../../../index';
 import { ExternalLinkIcon } from 'lucide-react';
 
 const STATES = {
@@ -14,7 +14,6 @@ export function ReviewAppButton({ url, slug, state }: { url: string; slug: strin
           <Button
             variant="outline"
             size="sm"
-            tabindex={-1}
             className={`${STATES[state]} gap-1.5`}
             onClick={() => window.open(url, '_blank')}>
             <ExternalLinkIcon className="size-4" />
