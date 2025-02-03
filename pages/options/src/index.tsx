@@ -4,7 +4,7 @@ import '@extension/ui/global.css';
 import Options from '@src/Options';
 
 function init() {
-  const appContainer = document.querySelector('#app-container');
+  const appContainer = document.querySelector('#shadow-root');
   if (!appContainer) {
     throw new Error('Can not find #app-container');
   }

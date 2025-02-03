@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { Badge } from '@extension/ui';
+import { Badge } from '../../../../index';
 import { PlayCircle, CheckCircle2, XCircle } from 'lucide-react';
 
 type PipelineStatus = 'running' | 'success' | 'failed' | 'pending' | string;

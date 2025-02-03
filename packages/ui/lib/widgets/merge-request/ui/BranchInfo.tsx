@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { GitBranchIcon, GitMergeIcon } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@extension/ui';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/index';
 
 interface BranchInfoProps {
   sourceBranch: string;
