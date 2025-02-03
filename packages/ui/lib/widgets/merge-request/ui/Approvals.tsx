@@ -7,7 +7,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@extension/ui';
+} from '../../../../index';
 
 interface Approver {
   name: string;

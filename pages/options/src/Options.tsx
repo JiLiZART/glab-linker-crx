@@ -1,18 +1,66 @@
 import { useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
-import { Button } from '@extension/ui';
+import { Button, Tabs, TabsTrigger, TabsList, TabsContent } from '@extension/ui';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { gitlabTokenStorage, gitlabApiUrlStorage } from '@extension/storage';
+import { Plus } from 'lucide-react';
 import { ApiUrlInput } from './ui/ApiUrlInput';
 import { ApiTokenInput } from './ui/ApiTokenInput';
 import '@src/Options.css';
+import { OptionsForm, OptionsFormValues } from './ui/form/form';
+
+const Options = () => {
+  const [tabs, setTabs] = useState<OptionsFormValues[]>([
+    {
+      apiUrl: 'https://gitlab.com',
+      gitlabToken: '',
+    },
+  ]);
+
+  const onAdd = () => {
+    setTabs(tabs => {
+      return [
+        ...tabs,
+        {
+          apiUrl: 'gitlab.com/' + tabs.length,
+          gitlabToken: '',
+        },
+      ];
+    });
+  };
+
+  return (
+    <div className="flex w-full min-h-screen bg-gray-50">
+      <div className="flex w-full max-w-6xl mx-auto p-6 gap-6">
+        <Tabs defaultValue="instance-1" orientation="vertical" className="w-64 shrink-0">
+          <TabsList className="h-auto flex-col items-stretch gap-1 bg-transparent">
+            {tabs.map(item => (
+              <TabsTrigger key={item.apiUrl} value={item.apiUrl} className="justify-start">
+                {item.apiUrl}
+              </TabsTrigger>
+            ))}
+            <Button onClick={onAdd} variant="outline" className="w-full justify-start mt-2">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Instance
+            </Button>
+          </TabsList>
+          {tabs.map(item => (
+            <TabsContent key={item.apiUrl} value={item.apiUrl}>
+              <OptionsForm />
+            </TabsContent>
+          ))}
+        </Tabs>
+      </div>
+    </div>
+  );
+};
 
 type FormValues = {
   apiUrl: string;
   gitlabToken: string;
 };
 
-const Options = () => {
+const OptionsOld = () => {
   const gitlabToken = useStorage(gitlabTokenStorage);
   const apiUrl = useStorage(gitlabApiUrlStorage);
   const methods = useForm<FormValues>({
@@ -58,8 +106,8 @@ const Options = () => {
           <div className="mt-6 rounded-md bg-gray-50 p-4">
             <h2 className="mb-2 text-sm font-medium text-gray-700">Required permission for token:</h2>
             <ul className="list-inside list-disc text-sm text-gray-600">
+              <li>api</li>
               <li>read_api</li>
-              <li>read_user</li>
               <li>read_repository</li>
               <li>write_repository</li>
             </ul>

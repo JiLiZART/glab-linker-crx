@@ -12,14 +12,14 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@extension/ui';
+} from '../../../index';
 import { AlertCircleIcon, CheckIcon, XIcon } from 'lucide-react';
-import { PipelineStatus } from './PipelineStatus';
-import { Approvals } from './Approvals';
-import { BranchInfo } from './BranchInfo';
-import { MergeRequestStats } from './MergeRequestStats';
-import { MergeRequestLabels } from './MergeRequestLabels';
-import { ReviewAppButton } from './ReviewAppButton';
+import { PipelineStatus } from './ui/PipelineStatus';
+import { Approvals } from './ui/Approvals';
+import { BranchInfo } from './ui/BranchInfo';
+import { MergeRequestStats } from './ui/MergeRequestStats';
+import { MergeRequestLabels } from './ui/MergeRequestLabels';
+import { ReviewAppButton } from './ui/ReviewAppButton';
 
 interface MergeRequestCardProps {
   title: string;
@@ -36,7 +36,7 @@ interface MergeRequestCardProps {
   status: 'opened' | 'merged' | 'closed' | string;
   isDraft?: boolean;
   isInProgress?: boolean;
-  pipeline: {
+  pipeline?: {
     status: 'running' | 'success' | 'failed' | 'pending' | string;
   };
   approvals?: {
@@ -49,7 +49,7 @@ interface MergeRequestCardProps {
   reviewApp?: {
     url?: string;
     slug?: string;
-    state?: string;
+    state?: 'available' | 'stopped' | string;
   };
   onMerge?: () => Promise<void>;
   onClose?: () => Promise<void>;
@@ -133,7 +133,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
             {reviewApp?.url && reviewApp?.slug && reviewApp?.state && status !== 'merged' && (
               <ReviewAppButton state={reviewApp?.state} url={reviewApp?.url} slug={reviewApp?.slug} />
             )}
-            <PipelineStatus status={pipeline.status} />
+            {pipeline && <PipelineStatus status={pipeline.status} />}
             <MergeRequestLabels status={status} isDraft={isDraft} isInProgress={isInProgress} />
           </div>
         </div>
@@ -148,11 +148,13 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
       </CardContent>
       {status === 'opened' && youCanMerge && (
         <CardFooter className="gap-2">
-          {renderMergeButton()}
-          <Button onClick={onClose} variant="destructive" className="flex-1">
-            <XIcon className="mr-2 size-4" />
-            Close
-          </Button>
+          <section>
+            {renderMergeButton()}
+            <Button onClick={onClose} variant="destructive" className="flex-1">
+              <XIcon className="mr-2 size-4" />
+              Close
+            </Button>
+          </section>
         </CardFooter>
       )}
     </Card>

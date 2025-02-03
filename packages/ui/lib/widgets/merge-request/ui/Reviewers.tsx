@@ -7,7 +7,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@extension/ui';
+} from '../../../../index';
 
 interface Reviewer {
   name: string;
@@ -38,9 +38,6 @@ export const Reviewers: FC<ReviewersProps> = ({ reviewers }) => {
           ))}
         </TooltipProvider>
       </div>
-      <span className="text-muted-foreground text-sm">
-        {approvers.length}/{requiredApprovals} approvals
-      </span>
     </div>
   );
 };

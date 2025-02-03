@@ -14,8 +14,8 @@ import {
 } from '@floating-ui/react';
 import { gitlabTokenStorage, gitlabApiUrlStorage } from '@extension/storage';
 import { GitLabService } from '@extension/shared';
+import { MergeRequestCard } from '@extension/ui';
 
-import { MergeRequestCard } from './ui/merge-request';
 import type { MergeRequestData, Environment } from './types';
 
 async function gitlabFactory() {
@@ -70,9 +70,11 @@ function transformMRData(data: MergeRequestData, envData?: Environment) {
       name: data.author.name,
       avatar: data.author.avatar_url,
     },
-    pipeline: {
-      status: data.pipeline.status,
-    },
+    pipeline: data.pipeline
+      ? {
+          status: data.pipeline.status,
+        }
+      : undefined,
     status: data.state,
     sourceBranch: data.source_branch,
     targetBranch: data.target_branch,
