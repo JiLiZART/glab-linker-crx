@@ -18,7 +18,11 @@ interface ReviewersProps {
   reviewers: Reviewer[];
 }
 
-export const Reviewers: FC<ReviewersProps> = ({ reviewers }) => {
+export const Reviewers: FC<ReviewersProps> = ({ reviewers = [] }) => {
+  if (!reviewers?.length) {
+    return null
+  }
+
   return (
     <div className="flex items-center gap-2">
       <div className="flex -space-x-2">
@@ -32,12 +36,15 @@ export const Reviewers: FC<ReviewersProps> = ({ reviewers }) => {
                 </Avatar>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Reviewer assigned by {reviewer.name}</p>
+                <p>Reviewer {reviewer.name}</p>
               </TooltipContent>
             </Tooltip>
           ))}
         </TooltipProvider>
       </div>
+      <span className="text-muted-foreground text-sm">
+        {reviewers.length} reviewers
+      </span>
     </div>
   );
 };

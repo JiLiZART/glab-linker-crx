@@ -13,9 +13,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../../../index';
-import { AlertCircleIcon, CheckIcon, XIcon } from 'lucide-react';
+import { AlertCircleIcon, CheckIcon, XIcon, RefreshCwIcon } from 'lucide-react';
 import { PipelineStatus } from './ui/PipelineStatus';
 import { Approvals } from './ui/Approvals';
+import { Reviewers } from './ui/Reviewers';
 import { BranchInfo } from './ui/BranchInfo';
 import { MergeRequestStats } from './ui/MergeRequestStats';
 import { MergeRequestLabels } from './ui/MergeRequestLabels';
@@ -43,6 +44,7 @@ interface MergeRequestCardProps {
     approvers: Array<{ name: string; avatar: string }>;
     required: number;
   };
+  reviewers?: Array<{ name: string; avatar: string }>;
   canMerge: boolean;
   youCanMerge?: boolean;
   mergeBlockers?: string[];
@@ -51,8 +53,8 @@ interface MergeRequestCardProps {
     slug?: string;
     state?: 'available' | 'stopped' | string;
   };
-  onMerge?: () => Promise<void>;
-  onClose?: () => Promise<void>;
+  onMerge?: () => Promise<unknown>;
+  onClose?: () => Promise<unknown>;
 }
 
 export const MergeRequestCard: FC<MergeRequestCardProps> = ({
@@ -69,6 +71,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
   isInProgress = false,
   pipeline,
   approvals,
+  reviewers,
   canMerge,
   youCanMerge,
   reviewApp = {},
@@ -77,10 +80,14 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
   onClose,
 }) => {
   const renderMergeButton = () => {
+    if (status !== 'opened') {
+      return null
+    }
+
     if (!canMerge) {
       const button = (
         <div>
-          <Button className="flex-1" disabled>
+          <Button disabled>
             <AlertCircleIcon className="mr-2 size-4" />
             Cannot merge
           </Button>
@@ -108,12 +115,25 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
     }
 
     return (
-      <Button className="flex-1" onClick={onMerge} variant="default">
+      <Button onClick={onMerge} variant="default">
         <CheckIcon className="mr-2 size-4" />
         Merge
       </Button>
     );
   };
+
+  const renderCloseButton = () => {
+    if (status !== 'closed' && youCanMerge) {
+      return (
+        <Button onClick={onClose} variant="destructive">
+          <XIcon className="mr-2 size-4" />
+          Close
+        </Button>
+      )
+    }
+
+    return null
+  }
 
   return (
     <Card className="w-full max-w-2xl transition-all hover:shadow-lg">
@@ -130,9 +150,6 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {reviewApp?.url && reviewApp?.slug && reviewApp?.state && status !== 'merged' && (
-              <ReviewAppButton state={reviewApp?.state} url={reviewApp?.url} slug={reviewApp?.slug} />
-            )}
             {pipeline && <PipelineStatus status={pipeline.status} />}
             <MergeRequestLabels status={status} isDraft={isDraft} isInProgress={isInProgress} />
           </div>
@@ -144,19 +161,23 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
           <BranchInfo sourceBranch={sourceBranch} targetBranch={targetBranch} />
           <MergeRequestStats changesCount={changesCount} hasConflicts={hasConflicts} createdAt={updatedAt} />
         </div>
-        {approvals && <Approvals approvers={approvals?.approvers} requiredApprovals={approvals?.required} />}
+        <div className="flex flex-row gap-4">
+          {approvals && <Approvals approvers={approvals?.approvers} requiredApprovals={approvals?.required} />}
+          {reviewers && <Reviewers reviewers={reviewers} />}
+        </div>
       </CardContent>
-      {status === 'opened' && youCanMerge && (
-        <CardFooter className="gap-2">
-          <section>
-            {renderMergeButton()}
-            <Button onClick={onClose} variant="destructive" className="flex-1">
-              <XIcon className="mr-2 size-4" />
-              Close
-            </Button>
-          </section>
-        </CardFooter>
-      )}
+      <CardFooter className="gap-2">
+        <section className="flex flex-row gap-4 w-full">
+          {renderMergeButton()}
+          {renderCloseButton()}
+          {reviewApp?.url && reviewApp?.slug && reviewApp?.state && status !== 'merged' && (
+            <ReviewAppButton state={reviewApp?.state} url={reviewApp?.url} slug={reviewApp?.slug} />
+          )}
+          <Button variant="ghost" className='ml-auto'>
+            <RefreshCwIcon />
+          </Button>
+        </section>
+      </CardFooter>
     </Card>
   );
 };
