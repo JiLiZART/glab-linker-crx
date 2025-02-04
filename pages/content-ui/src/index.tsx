@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import App from '@src/App';
+import ContentUI from '@src/ContentUI';
 import tailwindcssOutput from '../dist/tailwind-output.css?inline';
 
 const root = document.createElement('div');
@@ -30,4 +30,4 @@ if (navigator.userAgent.includes('Firefox')) {
 }
 
 shadowRoot.appendChild(rootIntoShadow);
-createRoot(rootIntoShadow).render(<App />);
+createRoot(rootIntoShadow).render(<ContentUI />);
