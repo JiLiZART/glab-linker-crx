@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Plus, ExternalLink } from 'lucide-react';
-import { Card, Button, Input, Checkbox } from '@extension/ui';
+import { Card, Button, Input, Checkbox, MergeRequestCard } from '@extension/ui';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { gitlabTokenStorage, gitlabApiUrlStorage } from '@extension/storage';
-import { MergeRequestCard } from '@extension/ui';
 
 export type OptionsFormValues = {
   apiUrl: string;
@@ -70,14 +69,14 @@ export const OptionsForm = () => {
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} className="flex-1 space-y-6">
         <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">GitLab Instance Settings</h2>
+          <h2 className="mb-4 text-lg font-semibold">GitLab Instance Settings</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Hostname</label>
+              <label className="mb-1 block text-sm font-medium">Hostname</label>
               <Input placeholder="e.g. gitlab.com" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Access Token</label>
+              <label className="mb-1 block text-sm font-medium">Access Token</label>
               <Input type="password" placeholder="Your GitLab access token" />
               <div className="mt-2 text-sm text-gray-600">
                 <a
@@ -86,13 +85,13 @@ export const OptionsForm = () => {
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-blue-600 hover:text-blue-800">
                   Create access token
-                  <ExternalLink className="h-3 w-3 ml-1" />
+                  <ExternalLink className="ml-1 size-3" />
                 </a>
               </div>
             </div>
             <div>
-              <h3 className="text-sm font-medium mb-2">Required API Scopes:</h3>
-              <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+              <h3 className="mb-2 text-sm font-medium">Required API Scopes:</h3>
+              <ul className="list-inside list-disc space-y-1 text-sm text-gray-600">
                 {requiredScopes.map(scope => (
                   <li key={scope}>{scope}</li>
                 ))}
@@ -101,7 +100,7 @@ export const OptionsForm = () => {
           </div>
         </Card>
         <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Display Settings</h2>
+          <h2 className="mb-4 text-lg font-semibold">Display Settings</h2>
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <Checkbox id="show-description" />
@@ -128,7 +127,7 @@ export const OptionsForm = () => {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <Button type="submit">Save Settings</Button>
-            {saved && <span className="text-sm text-green-600 font-medium">Success saved!</span>}
+            {saved && <span className="text-sm font-medium text-green-600">Success saved!</span>}
           </div>
 
           <Button variant="destructive">Remove Instance</Button>

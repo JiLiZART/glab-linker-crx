@@ -81,7 +81,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
 }) => {
   const renderMergeButton = () => {
     if (status !== 'opened') {
-      return null
+      return null;
     }
 
     if (!canMerge) {
@@ -129,11 +129,11 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
           <XIcon className="mr-2 size-4" />
           Close
         </Button>
-      )
+      );
     }
 
-    return null
-  }
+    return null;
+  };
 
   return (
     <Card className="w-full max-w-2xl transition-all hover:shadow-lg">
@@ -167,13 +167,13 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
         </div>
       </CardContent>
       <CardFooter className="gap-2">
-        <section className="flex flex-row gap-4 w-full">
+        <section className="flex w-full flex-row gap-4">
           {renderMergeButton()}
           {renderCloseButton()}
           {reviewApp?.url && reviewApp?.slug && reviewApp?.state && status !== 'merged' && (
             <ReviewAppButton state={reviewApp?.state} url={reviewApp?.url} slug={reviewApp?.slug} />
           )}
-          <Button variant="ghost" className='ml-auto'>
+          <Button variant="ghost" className="ml-auto">
             <RefreshCwIcon />
           </Button>
         </section>
