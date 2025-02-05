@@ -14,7 +14,7 @@ export function ReviewAppButton({ url, slug, state }: { url: string; slug: strin
           <Button
             variant="outline"
             size="sm"
-            className={`${STATES[state]} gap-1.5 ml-auto`}
+            className={`${STATES[state]} ml-auto gap-1.5`}
             onClick={() => window.open(url, '_blank')}>
             <ExternalLinkIcon className="size-4" />
             Review App
