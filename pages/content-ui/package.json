@@ -34,7 +34,7 @@
     "@extension/tsconfig": "workspace:*",
     "@extension/hmr": "workspace:*",
     "@extension/vite-config": "workspace:*",
-    "concurrently": "^9.0.1",
+    "concurrently": "^9.1.2",
     "postcss-load-config": "^6.0.1",
     "cross-env": "^7.0.3"
   },
