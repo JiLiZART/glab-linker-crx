@@ -6,42 +6,51 @@ import { DisplaySettings } from './settings/DisplaySettings';
 import { PositionSettings } from './settings/PositionSettings';
 import { AdvancedSettings } from './settings/AdvancedSettings';
 import { useForm, FormProvider } from 'react-hook-form';
-import { Button } from '@extension/ui';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { gitlabTokenStorage, gitlabApiUrlStorage } from '@extension/storage';
+import { gitlabItemsStorage } from '@extension/storage';
 
 import '@src/Options.css';
+import { Actions } from './settings/Actions';
 
 type FormValues = {
   apiUrl: string;
-  gitlabToken: string;
+  token: string;
 };
 
 const Options = () => {
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
-  };
-
-  const gitlabToken = useStorage(gitlabTokenStorage);
-  const apiUrl = useStorage(gitlabApiUrlStorage);
+  const [menuItems, setMenuItems] = useState<Array<{ name: string; id: string }>>([
+    { name: 'gitlab.com', id: 'gitlab.com' },
+    { name: 'company.gitlab.com', id: 'company.gitlab.com' },
+  ]);
+  const [saved, setSaved] = useState(false);
+  const token = '';
+  const apiUrl = '';
+  const gitlabItems = useStorage(gitlabItemsStorage);
+  // const apiUrl = useStorage(gitlabApiUrlStorage);
   const methods = useForm<FormValues>({
     defaultValues: {
       apiUrl,
-      gitlabToken,
+      token,
     },
   });
 
-  const [saved, setSaved] = useState(false);
-
   const onSubmit = async (data: FormValues) => {
-    const { apiUrl, gitlabToken } = data;
+    const { apiUrl, token } = data;
 
-    await gitlabTokenStorage.setToken(gitlabToken);
-    await gitlabApiUrlStorage.setUrl(apiUrl);
+    // await gitlabTokenStorage.setToken(gitlabToken);
+    // await gitlabApiUrlStorage.setUrl(apiUrl);
 
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+  };
+
+  const onAddItem = () => {
+    setMenuItems([...menuItems, { name: 'New Instance', id: nanoid() }]);
+    gitlabItems.addItem('New Instance');
+  };
+
+  const onShowItem = (id: string) => {
+    setMenuItems(menuItems.filter(item => item.id !== id));
   };
 
   return (
@@ -56,10 +65,7 @@ const Options = () => {
             <PositionSettings />
             <AdvancedSettings />
 
-            <div className="flex items-center gap-4">
-              <Button onClick={handleSave}>Save Settings</Button>
-              {saved && <span className="text-sm font-medium text-green-600">Success saved!</span>}
-            </div>
+            <Actions saved={saved} />
           </div>
         </div>
       </form>

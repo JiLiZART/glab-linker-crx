@@ -1,6 +1,6 @@
 {
   "extensionDescription": {
-    "description": "Gitlab Merge Requests extension",
+    "description": "Gitlab Merge Requests Linker",
     "message": "Chrome extension to manage Gitlab Merge Requests in any page"
   },
   "extensionName": {

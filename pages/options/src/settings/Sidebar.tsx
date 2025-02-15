@@ -1,41 +1,77 @@
 import { Button } from '@extension/ui';
 import { Plus, Server } from 'lucide-react';
 
-export const Sidebar = () => {
+const SidebarHeader = () => {
+  return (
+    <div className="mb-1 flex items-center gap-2 px-2">
+      <img src="/icon.svg" className="size-10 text-gray-500" alt="Gitlab MR Linker Options" />
+
+      <h2 className="text-sm font-semibold">Gitlab Linker</h2>
+    </div>
+  );
+};
+
+const MenuItem = (props: { children: React.ReactNode; id: string } & Pick<SidebarProps, 'onShowItem'>) => {
+  const { children, id, onShowItem } = props;
+
+  const onClick = () => {
+    onShowItem(id);
+  };
+
+  return (
+    <Button
+      onClick={onClick}
+      variant="ghost"
+      className="h-9 w-full justify-start rounded-lg text-sm font-normal hover:bg-gray-100">
+      {children}
+    </Button>
+  );
+};
+
+const AddMenuItem = (props: { children: React.ReactNode } & Pick<SidebarProps, 'onAddItem'>) => {
+  const { children, onAddItem } = props;
+
+  return (
+    <Button onClick={onAddItem} variant="secondary" className="h-9 w-full justify-start text-sm">
+      <Plus className="mr-2 size-4" />
+      {children}
+    </Button>
+  );
+};
+
+const MenuHeader = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="flex items-center gap-2">
+      <Server className="size-4 text-gray-500" />
+      <h3 className="text-sm font-medium text-gray-600">{children}</h3>
+    </div>
+  );
+};
+
+export type SidebarProps = {
+  onAddItem: () => void;
+  onShowItem: (id: string) => void;
+  menuItems: Array<{ name: string; id: string }>;
+};
+
+export const Sidebar = (props: SidebarProps) => {
+  const { onAddItem, onShowItem, menuItems } = props;
+
   return (
     <div className="min-h-screen w-64 shrink-0 border-r bg-white">
       <div className="border-b p-4">
-        <div className="mb-1 flex items-center gap-2 px-2">
-          <img src="/icon.svg" className="size-10 text-gray-500" alt="Gitlab MR Linker Options" />
-
-          <h2 className="text-sm font-semibold">Gitlab Linker</h2>
-        </div>
+        <SidebarHeader />
       </div>
-      <div className="p-3">
-        <div className="mb-3">
-          <div className="mb-2 flex items-center justify-between px-2">
-            <div className="flex items-center gap-2">
-              <Server className="size-4 text-gray-500" />
-              <h3 className="text-sm font-medium text-gray-600">GitLab Instances</h3>
-            </div>
-          </div>
-          <div className="space-y-1">
-            <Button
-              variant="ghost"
-              className="h-9 w-full justify-start rounded-lg text-sm font-normal hover:bg-gray-100">
-              gitlab.com
-            </Button>
-            <Button
-              variant="ghost"
-              className="h-9 w-full justify-start rounded-lg text-sm font-normal hover:bg-gray-100">
-              company.gitlab.com
-            </Button>
-          </div>
+      <div className="flex flex-col gap-3 p-3">
+        <MenuHeader>GitLab Instances</MenuHeader>
+        <div className="space-y-1">
+          {menuItems.map(item => (
+            <MenuItem key={item.id} id={item.id} onShowItem={onShowItem}>
+              {item.name}
+            </MenuItem>
+          ))}
         </div>
-        <Button variant="secondary" className="h-9 w-full justify-start text-sm">
-          <Plus className="mr-2 size-4" />
-          Add Instance
-        </Button>
+        <AddMenuItem onAddItem={onAddItem}>Add Instance</AddMenuItem>
       </div>
     </div>
   );
