@@ -195,12 +195,14 @@ export default function App() {
 
   const handleMerge = async () => {
     if (mrInfo && gitlab) {
+      // handle 405 and json {"message":"405 Method Not Allowed"}
       await gitlab.mergeMR(mrInfo.projectId, mrInfo.iid);
     }
   };
 
   const handleClose = async () => {
     if (mrInfo && gitlab) {
+      // handle 405 and json {"message":"405 Method Not Allowed"}
       await gitlab.closeMR(mrInfo.projectId, mrInfo.iid);
     }
   };
