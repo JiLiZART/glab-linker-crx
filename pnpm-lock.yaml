@@ -82,8 +82,8 @@ importers:
         specifier: ^9.1.4
         version: 9.1.4
       lint-staged:
-        specifier: ^15.2.7
-        version: 15.2.7
+        specifier: ^15.4.3
+        version: 15.4.3
       postcss:
         specifier: ^8.4.47
         version: 8.4.47
@@ -110,7 +110,7 @@ importers:
         version: 5.7.2
       vite:
         specifier: 6.0.11
-        version: 6.0.11(@types/node@20.16.5)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.6.1)
+        version: 6.0.11(@types/node@20.16.5)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.7.0)
 
   chrome-extension:
     dependencies:
@@ -138,7 +138,7 @@ importers:
         version: link:../packages/vite-config
       '@laynezh/vite-plugin-lib-assets':
         specifier: ^1.0.0
-        version: 1.0.0(vite@6.0.11(@types/node@22.13.4)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.6.1))
+        version: 1.0.0(vite@6.0.11(@types/node@22.13.5)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.7.0))
       '@types/ws':
         specifier: ^8.5.12
         version: 8.5.12
@@ -186,7 +186,7 @@ importers:
         version: 4.24.0
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@swc/core@1.9.3)(@types/node@22.13.4)(typescript@5.7.2)
+        version: 10.9.2(@swc/core@1.9.3)(@types/node@22.13.5)(typescript@5.7.2)
       ws:
         specifier: 8.18.0
         version: 8.18.0
@@ -386,7 +386,7 @@ importers:
         version: link:../tsconfig
       '@vitejs/plugin-react-swc':
         specifier: ^3.7.2
-        version: 3.7.2(vite@6.0.11(@types/node@22.13.4)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.6.1))
+        version: 3.7.2(vite@6.0.11(@types/node@22.13.5)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.7.0))
       deepmerge:
         specifier: ^4.3.1
         version: 4.3.1
@@ -466,7 +466,7 @@ importers:
         version: 7.0.3
       postcss-load-config:
         specifier: ^6.0.1
-        version: 6.0.1(jiti@1.21.6)(postcss@8.5.1)(tsx@4.19.1)(yaml@2.6.1)
+        version: 6.0.1(jiti@1.21.6)(postcss@8.5.1)(tsx@4.19.1)(yaml@2.7.0)
 
   pages/options:
     dependencies:
@@ -494,7 +494,7 @@ importers:
         version: 7.0.3
       postcss-load-config:
         specifier: ^6.0.1
-        version: 6.0.1(jiti@1.21.6)(postcss@8.5.1)(tsx@4.19.1)(yaml@2.6.1)
+        version: 6.0.1(jiti@1.21.6)(postcss@8.5.1)(tsx@4.19.1)(yaml@2.7.0)
 
   pages/side-panel:
     dependencies:
@@ -519,7 +519,7 @@ importers:
         version: 7.0.3
       postcss-load-config:
         specifier: ^6.0.1
-        version: 6.0.1(jiti@1.21.6)(postcss@8.5.1)(tsx@4.19.1)(yaml@2.6.1)
+        version: 6.0.1(jiti@1.21.6)(postcss@8.5.1)(tsx@4.19.1)(yaml@2.7.0)
 
   tests/e2e:
     devDependencies:
@@ -2492,8 +2492,8 @@ packages:
   '@types/node@22.13.0':
     resolution: {integrity: sha512-ClIbNe36lawluuvq3+YYhnIN2CELi+6q8NpnM7PYp4hBn/TatfboPgVSm2rwKRfnV2M+Ty9GWDFI64KEe+kysA==}
 
-  '@types/node@22.13.4':
-    resolution: {integrity: sha512-ywP2X0DYtX3y08eFVx5fNIw7/uIv8hYUKgXoK8oayJlLnKcRfEYCxWMVE1XagUdVtCJlZT1AU4LXEABW+L1Peg==}
+  '@types/node@22.13.5':
+    resolution: {integrity: sha512-+lTU0PxZXn0Dr1NBtC7Y8cR21AJr87dLLU953CWA6pMxxv/UDc7jYAY90upcrie1nRcD6XNG5HOYEDtgW5TxAg==}
 
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -3141,8 +3141,8 @@ packages:
   colorette@2.0.20:
     resolution: {integrity: sha512-IfEDxwoWIjkeXL1eXcDiow4UbKjhLdq6/EuSVR9GMN7KVH3r9gQ83e73hsz1Nd1T3ijd5xv1wcWRYO+D6kCI2w==}
 
-  commander@12.1.0:
-    resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
+  commander@13.1.0:
+    resolution: {integrity: sha512-/rFeCpNJQbhSZjGVwO9RFV3xPqbnERS8MmIQzCtD/zl6gpJuV/bMLuN92oG3F7d8oDEHHRrujSXNUr8fpjntKw==}
     engines: {node: '>=18'}
 
   commander@2.20.3:
@@ -3438,8 +3438,8 @@ packages:
     engines: {node: '>=0.10.0'}
     hasBin: true
 
-  electron-to-chromium@1.5.101:
-    resolution: {integrity: sha512-L0ISiQrP/56Acgu4/i/kfPwWSgrzYZUnQrC0+QPFuhqlLP1Ir7qzPPDVS9BcKIyWTRU8+o6CC8dKw38tSWhYIA==}
+  electron-to-chromium@1.5.103:
+    resolution: {integrity: sha512-P6+XzIkfndgsrjROJWfSvVEgNHtPgbhVyTkwLjUM2HU/h7pZRORgaTlHqfAikqxKmdJMLW8fftrdGWbd/Ds0FA==}
 
   electron-to-chromium@1.5.67:
     resolution: {integrity: sha512-nz88NNBsD7kQSAGGJyp8hS6xSPtWwqNogA0mjtc2nUYeEf3nURK9qpV18TuBdDmEDgVWotS8Wkzf+V52dSQ/LQ==}
@@ -4403,6 +4403,10 @@ packages:
     resolution: {integrity: sha512-eop+wDAvpItUys0FWkHIKeC9ybYrTGbU41U5K7+bttZZeohvnY7M9dZ5kB21GNWiFT2q1OoPTvncPCgSOVO5ow==}
     engines: {node: '>=14'}
 
+  lilconfig@3.1.3:
+    resolution: {integrity: sha512-/vlFKAoH5Cgt3Ie+JLhRbwOsCQePABiU3tJ1egGvyQ+33R/vcwM2Zl2QR/LzjsBeItPt3oSVXapn+m4nQDvpzw==}
+    engines: {node: '>=14'}
+
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
@@ -4410,8 +4414,8 @@ packages:
     resolution: {integrity: sha512-wM1+Z03eypVAVUCE7QdSqpVIvelbOakn1M0bPDoA4SGWPx3sNDVUiMo3L6To6WWGClB7VyXnhQ4Sn7gxiJbE6A==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
-  lint-staged@15.2.7:
-    resolution: {integrity: sha512-+FdVbbCZ+yoh7E/RosSdqKJyUM2OEjTciH0TFNkawKgvFp1zbGlEC39RADg+xKBG1R4mhoH2j85myBQZ5wR+lw==}
+  lint-staged@15.4.3:
+    resolution: {integrity: sha512-FoH1vOeouNh1pw+90S+cnuoFwRfUD9ijY2GKy5h7HS3OR7JVir2N2xrsa0+Twc1B7cW72L+88geG5cW4wIhn7g==}
     engines: {node: '>=18.12.0'}
     hasBin: true
 
@@ -5935,13 +5939,8 @@ packages:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}
     engines: {node: '>=10'}
 
-  yaml@2.4.5:
-    resolution: {integrity: sha512-aBx2bnqDzVOyNKfsysjA2ms5ZlnjSAW2eG3/L5G/CSujfjLJTJsEw1bGw8kCf04KodQWk1pxlGnZ56CRxiawmg==}
-    engines: {node: '>= 14'}
-    hasBin: true
-
-  yaml@2.6.1:
-    resolution: {integrity: sha512-7r0XPzioN/Q9kXBro/XPnA6kznR73DHq+GXh5ON7ZozRO6aMjbmiBuKste2wslTFkC5d1dw0GooOCepZXJ2SAg==}
+  yaml@2.7.0:
+    resolution: {integrity: sha512-+hSoy/QHluxmC9kCIJyL/uyFmLmc+e5CFR5Wa+bpIhIj85LVb9ZH2nVnqrHoSvKogwODv0ClqZkmiSSaIH5LTA==}
     engines: {node: '>= 14'}
     hasBin: true
 
@@ -6453,13 +6452,13 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@laynezh/vite-plugin-lib-assets@1.0.0(vite@6.0.11(@types/node@22.13.4)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.6.1))':
+  '@laynezh/vite-plugin-lib-assets@1.0.0(vite@6.0.11(@types/node@22.13.5)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.7.0))':
     dependencies:
       escape-string-regexp: 4.0.0
       loader-utils: 3.3.1
       mrmime: 1.0.1
       semver: 7.7.1
-      vite: 6.0.11(@types/node@22.13.4)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.6.1)
+      vite: 6.0.11(@types/node@22.13.5)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.7.0)
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -7751,7 +7750,7 @@ snapshots:
     dependencies:
       undici-types: 6.20.0
 
-  '@types/node@22.13.4':
+  '@types/node@22.13.5':
     dependencies:
       undici-types: 6.20.0
 
@@ -7835,7 +7834,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/typescript-estree': 7.18.0(typescript@5.7.2)
       '@typescript-eslint/utils': 7.18.0(eslint@8.57.0)(typescript@5.7.2)
-      debug: 4.3.7
+      debug: 4.4.0(supports-color@8.1.1)
       eslint: 8.57.0
       ts-api-utils: 1.4.3(typescript@5.7.2)
     optionalDependencies:
@@ -7878,10 +7877,10 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vitejs/plugin-react-swc@3.7.2(vite@6.0.11(@types/node@22.13.4)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.6.1))':
+  '@vitejs/plugin-react-swc@3.7.2(vite@6.0.11(@types/node@22.13.5)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.7.0))':
     dependencies:
       '@swc/core': 1.9.3
-      vite: 6.0.11(@types/node@22.13.4)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.6.1)
+      vite: 6.0.11(@types/node@22.13.5)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.7.0)
     transitivePeerDependencies:
       - '@swc/helpers'
 
@@ -8474,7 +8473,7 @@ snapshots:
   browserslist@4.24.4:
     dependencies:
       caniuse-lite: 1.0.30001700
-      electron-to-chromium: 1.5.101
+      electron-to-chromium: 1.5.103
       node-releases: 2.0.19
       update-browserslist-db: 1.1.2(browserslist@4.24.4)
 
@@ -8627,7 +8626,7 @@ snapshots:
 
   colorette@2.0.20: {}
 
-  commander@12.1.0: {}
+  commander@13.1.0: {}
 
   commander@2.20.3: {}
 
@@ -8924,7 +8923,7 @@ snapshots:
     dependencies:
       jake: 10.9.2
 
-  electron-to-chromium@1.5.101: {}
+  electron-to-chromium@1.5.103: {}
 
   electron-to-chromium@1.5.67: {}
 
@@ -10156,22 +10155,24 @@ snapshots:
 
   lilconfig@3.1.2: {}
 
+  lilconfig@3.1.3: {}
+
   lines-and-columns@1.2.4: {}
 
   lines-and-columns@2.0.4: {}
 
-  lint-staged@15.2.7:
+  lint-staged@15.4.3:
     dependencies:
-      chalk: 5.3.0
-      commander: 12.1.0
-      debug: 4.3.7
+      chalk: 5.4.1
+      commander: 13.1.0
+      debug: 4.4.0(supports-color@8.1.1)
       execa: 8.0.1
-      lilconfig: 3.1.2
+      lilconfig: 3.1.3
       listr2: 8.2.5
       micromatch: 4.0.8
       pidtree: 0.6.0
       string-argv: 0.3.2
-      yaml: 2.4.5
+      yaml: 2.7.0
     transitivePeerDependencies:
       - supports-color
 
@@ -10597,20 +10598,20 @@ snapshots:
 
   postcss-load-config@4.0.2(postcss@8.4.47)(ts-node@10.9.2(@swc/core@1.9.3)(@types/node@20.16.5)(typescript@5.7.2)):
     dependencies:
-      lilconfig: 3.1.2
-      yaml: 2.6.1
+      lilconfig: 3.1.3
+      yaml: 2.7.0
     optionalDependencies:
       postcss: 8.4.47
       ts-node: 10.9.2(@swc/core@1.9.3)(@types/node@20.16.5)(typescript@5.7.2)
 
-  postcss-load-config@6.0.1(jiti@1.21.6)(postcss@8.5.1)(tsx@4.19.1)(yaml@2.6.1):
+  postcss-load-config@6.0.1(jiti@1.21.6)(postcss@8.5.1)(tsx@4.19.1)(yaml@2.7.0):
     dependencies:
       lilconfig: 3.1.2
     optionalDependencies:
       jiti: 1.21.6
       postcss: 8.5.1
       tsx: 4.19.1
-      yaml: 2.6.1
+      yaml: 2.7.0
 
   postcss-nested@6.2.0(postcss@8.4.47):
     dependencies:
@@ -11459,14 +11460,14 @@ snapshots:
       '@swc/core': 1.9.3
     optional: true
 
-  ts-node@10.9.2(@swc/core@1.9.3)(@types/node@22.13.4)(typescript@5.7.2):
+  ts-node@10.9.2(@swc/core@1.9.3)(@types/node@22.13.5)(typescript@5.7.2):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.11
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 22.13.4
+      '@types/node': 22.13.5
       acorn: 8.14.0
       acorn-walk: 8.3.4
       arg: 4.1.3
@@ -11676,7 +11677,7 @@ snapshots:
       d3-time: 3.1.0
       d3-timer: 3.0.1
 
-  vite@6.0.11(@types/node@20.16.5)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.6.1):
+  vite@6.0.11(@types/node@20.16.5)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.7.0):
     dependencies:
       esbuild: 0.24.2
       postcss: 8.5.1
@@ -11688,21 +11689,21 @@ snapshots:
       sass: 1.79.4
       terser: 5.39.0
       tsx: 4.19.1
-      yaml: 2.6.1
+      yaml: 2.7.0
 
-  vite@6.0.11(@types/node@22.13.4)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.6.1):
+  vite@6.0.11(@types/node@22.13.5)(jiti@1.21.6)(sass@1.79.4)(terser@5.39.0)(tsx@4.19.1)(yaml@2.7.0):
     dependencies:
       esbuild: 0.24.2
       postcss: 8.5.1
       rollup: 4.28.0
     optionalDependencies:
-      '@types/node': 22.13.4
+      '@types/node': 22.13.5
       fsevents: 2.3.3
       jiti: 1.21.6
       sass: 1.79.4
       terser: 5.39.0
       tsx: 4.19.1
-      yaml: 2.6.1
+      yaml: 2.7.0
 
   wait-port@1.1.0:
     dependencies:
@@ -11899,9 +11900,7 @@ snapshots:
 
   y18n@5.0.8: {}
 
-  yaml@2.4.5: {}
-
-  yaml@2.6.1: {}
+  yaml@2.7.0: {}
 
   yargs-parser@20.2.9: {}
 
