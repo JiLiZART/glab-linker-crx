@@ -8,6 +8,7 @@ import { PositionSettings } from './settings/PositionSettings';
 import { AdvancedSettings } from './settings/AdvancedSettings';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
+import type { GitlabItemsStorage } from '@extension/storage';
 import { gitlabItemsStorage } from '@extension/storage';
 
 import '@src/Options.css';
@@ -26,7 +27,7 @@ const Options = () => {
   const [saved, setSaved] = useState(false);
   const token = '';
   const apiUrl = '';
-  const gitlabItems = useStorage(gitlabItemsStorage);
+  const gitlabItems = useStorage<GitlabItemsStorage>(gitlabItemsStorage);
   // const apiUrl = useStorage(gitlabApiUrlStorage);
   const methods = useForm<FormValues>({
     defaultValues: {
@@ -35,8 +36,10 @@ const Options = () => {
     },
   });
 
-  const onSubmit = async (data: FormValues) => {
-    const { apiUrl, token } = data;
+  const onSubmit = async (values: FormValues) => {
+    // const { apiUrl, token } = data;
+
+    console.log({ values });
 
     // await gitlabTokenStorage.setToken(gitlabToken);
     // await gitlabApiUrlStorage.setUrl(apiUrl);
@@ -47,7 +50,8 @@ const Options = () => {
 
   const onAddItem = () => {
     setMenuItems([...menuItems, { name: 'New Instance', id: nanoid() }]);
-    gitlabItems.addItem('New Instance');
+    console.log({ gitlabItems });
+    // gitlabItems.addItem('New Instance');
   };
 
   const onShowItem = (id: string) => {

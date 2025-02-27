@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Plus, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { Card, Button, Input, Checkbox, MergeRequestCard } from '@extension/ui';
 import { useForm, FormProvider } from 'react-hook-form';
-import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { gitlabTokenStorage, gitlabApiUrlStorage } from '@extension/storage';
+// import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 
 export type OptionsFormValues = {
   apiUrl: string;
@@ -11,22 +10,24 @@ export type OptionsFormValues = {
 };
 
 export const OptionsForm = () => {
-  const gitlabToken = useStorage(gitlabTokenStorage);
-  const apiUrl = useStorage(gitlabApiUrlStorage);
+  // const gitlabToken = useStorage(gitlabTokenStorage);
+  // const apiUrl = useStorage(gitlabApiUrlStorage);
   const methods = useForm<OptionsFormValues>({
     defaultValues: {
-      apiUrl,
-      gitlabToken,
+      apiUrl: '',
+      gitlabToken: '',
     },
   });
 
   const [saved, setSaved] = useState(false);
 
-  const onSubmit = async (data: OptionsFormValues) => {
-    const { apiUrl, gitlabToken } = data;
+  const onSubmit = async (values: OptionsFormValues) => {
+    // const { apiUrl, gitlabToken } = data;
 
-    await gitlabTokenStorage.setToken(gitlabToken);
-    await gitlabApiUrlStorage.setUrl(apiUrl);
+    console.log({ values });
+
+    // await gitlabTokenStorage.setToken(gitlabToken);
+    // await gitlabApiUrlStorage.setUrl(apiUrl);
 
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -72,12 +73,16 @@ export const OptionsForm = () => {
           <h2 className="mb-4 text-lg font-semibold">GitLab Instance Settings</h2>
           <div className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm font-medium">Hostname</label>
-              <Input placeholder="e.g. gitlab.com" />
+              <label htmlFor="hostname" className="mb-1 block text-sm font-medium">
+                Hostname
+              </label>
+              <Input name="hostname" placeholder="e.g. gitlab.com" />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium">Access Token</label>
-              <Input type="password" placeholder="Your GitLab access token" />
+              <label htmlFor="token" className="mb-1 block text-sm font-medium">
+                Access Token
+              </label>
+              <Input name="token" type="password" placeholder="Your GitLab access token" />
               <div className="mt-2 text-sm text-gray-600">
                 <a
                   href="https://gitlab.com/-/profile/personal_access_tokens"

@@ -41,6 +41,7 @@ function useGitlab() {
     //   .catch(err => {
     //     console.log({ err });
     //   });
+    setLoaded(true);
   }, []);
 
   return loaded ? gitlabRef.current : null;

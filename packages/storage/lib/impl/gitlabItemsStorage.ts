@@ -3,7 +3,7 @@ import { createStorage } from '../base/base';
 import type { BaseStorage } from '../base/types';
 import { nanoid } from 'nanoid';
 
-type GitlabItemStorageConfig = {
+export type GitlabItemStorageConfig = {
   id: string;
   name: string;
   apiUrl?: string;

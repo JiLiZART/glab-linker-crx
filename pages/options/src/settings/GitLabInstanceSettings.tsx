@@ -9,12 +9,16 @@ export const GitLabInstanceSettings = () => {
       <h2 className="mb-4 text-lg font-semibold">GitLab Instance Settings</h2>
       <div className="space-y-4">
         <div>
-          <label className="mb-1 block text-sm font-medium">Hostname</label>
-          <Input placeholder="e.g. gitlab.com" />
+          <label htmlFor="hostname" className="mb-1 block text-sm font-medium">
+            Hostname
+          </label>
+          <Input name="hostname" placeholder="e.g. gitlab.com" />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">Access Token</label>
-          <Input type="password" placeholder="Your GitLab access token" />
+          <label htmlFor="token" className="mb-1 block text-sm font-medium">
+            Access Token
+          </label>
+          <Input type="password" name="token" placeholder="Your GitLab access token" />
           <div className="mt-2 text-sm text-gray-600">
             <a
               href="https://gitlab.com/-/profile/personal_access_tokens"
