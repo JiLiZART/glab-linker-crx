@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { nanoid } from 'nanoid';
 import { Sidebar } from './settings/Sidebar';
 import { GitLabInstanceSettings } from './settings/GitLabInstanceSettings';
 import { URLPatternSettings } from './settings/URLPatternSettings';
@@ -57,7 +58,7 @@ const Options = () => {
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} className="flex min-h-screen w-full bg-gray-50">
         <div className="mx-auto flex w-full max-w-6xl gap-6">
-          <Sidebar />
+          <Sidebar menuItems={menuItems} onAddItem={onAddItem} onShowItem={onShowItem} />
           <div className="flex-1 space-y-6 py-6 pr-6">
             <GitLabInstanceSettings />
             <URLPatternSettings />
