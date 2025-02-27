@@ -12,32 +12,35 @@ import {
   useRole,
   FloatingFocusManager,
 } from '@floating-ui/react';
-import { gitlabTokenStorage, gitlabApiUrlStorage } from '@extension/storage';
-import { GitLabService } from '@extension/shared';
+// import { gitlabItemsStorage } from '@extension/storage';
+import type { GitLabService } from '@extension/shared';
 import { MergeRequestCard } from '@extension/ui';
 
 import type { MergeRequestData, Environment } from './types';
 
-async function gitlabFactory() {
-  const token = await gitlabTokenStorage.get();
-  const apiUrl = await gitlabApiUrlStorage.get();
-
-  return new GitLabService(token, apiUrl);
-}
+// async function gitlabFactory(id: string) {
+//   const item = await gitlabItemsStorage.findById(id)
+//   const token = item?.token;
+//   const apiUrl = item?.apiUrl;
+//
+//   if (token && apiUrl) {
+//     return new GitLabService(token, apiUrl);
+//   }
+// }
 
 function useGitlab() {
   const gitlabRef = useRef<GitLabService | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    gitlabFactory()
-      .then(gitlab => {
-        gitlabRef.current = gitlab;
-        setLoaded(true);
-      })
-      .catch(err => {
-        console.log({ err });
-      });
+    // gitlabFactory()
+    //   .then(gitlab => {
+    //     gitlabRef.current = gitlab;
+    //     setLoaded(true);
+    //   })
+    //   .catch(err => {
+    //     console.log({ err });
+    //   });
   }, []);
 
   return loaded ? gitlabRef.current : null;

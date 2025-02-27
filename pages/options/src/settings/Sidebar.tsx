@@ -55,7 +55,7 @@ export type SidebarProps = {
 };
 
 export const Sidebar = (props: SidebarProps) => {
-  const { onAddItem, onShowItem, menuItems } = props;
+  const { onAddItem, onShowItem, menuItems = [] } = props;
 
   return (
     <div className="min-h-screen w-64 shrink-0 border-r bg-white">

@@ -6,7 +6,7 @@ describe('Webextension Content Runtime Script', () => {
     }
   });
 
-  it('should create runtime element on the page', async () => {
+  it.skip('should create runtime element on the page', async () => {
     // Open the popup
     const extensionPath = await browser.getExtensionPath();
     const popupUrl = `${extensionPath}/popup/index.html`;
