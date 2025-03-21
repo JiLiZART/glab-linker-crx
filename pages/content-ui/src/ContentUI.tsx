@@ -127,6 +127,10 @@ export default function App() {
   const dismiss = useDismiss(context);
   const role = useRole(context);
 
+  const isClick = false;
+
+  const interactions = [isClick && click, dismiss, role].filter(item => Boolean(item));
+
   // Merge all the interactions into prop getters
   const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
@@ -163,8 +167,8 @@ export default function App() {
       setMrInfo(null);
 
       refs.setReference(link);
-      link.style.cursor = 'wait';
-      link.title = '';
+      // link.style.cursor = 'wait';
+      // link.title = '';
 
       Object.entries(getReferenceProps()).forEach(([key, value]) => {
         if (key.startsWith('aria-')) {
