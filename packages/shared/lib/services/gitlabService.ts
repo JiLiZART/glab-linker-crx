@@ -1,13 +1,8 @@
-export const GITLAB_BASE = 'https://gitlab.com';
+import { GitlabApi } from './gitlabApi';
+import { GitlabCache } from './gitlabCache';
+import type { Environment, MergeRequest } from './types';
 
-// const hostname = 'gitlab.bitmware.com';
-// const urlPattern = new RegExp(`https://${hostname}/(.+?)/-/merge_requests/(\d+)`);
-
-// const url = 'https://gitlab.bitmware.com/hodl/content/debifi/debifi-akh-panel/-/merge_requests/2';
-
-// url.match(urlPattern);
-
-function mrToApiUrl(hostname: string, mrUrl: string) {
+function extractMRFromUrl(mrUrl: string, hostname: string) {
   // Extract project path and MR ID from the URL
   // const urlPattern = /https:\/\/gitlab\.com\/(.+?)\/-\/merge_requests\/(\d+)/;
   const urlPattern = new RegExp(`https://${hostname}/(.+?)/-/merge_requests/(\\d+)`);
@@ -17,67 +12,102 @@ function mrToApiUrl(hostname: string, mrUrl: string) {
     throw new Error('Invalid Merge Request URL format.');
   }
 
-  const projectPath = match[1];
-  const mergeRequestId = match[2];
+  const projectId = match[1];
+  const mrIid = match[2];
 
   // Construct the API URL
-  return `projects/${encodeURIComponent(projectPath)}/merge_requests/${mergeRequestId}`;
+  return {
+    projectId,
+    mrIid,
+  };
 }
 
+type GitlabInstanceConfig = {
+  id: string;
+  name: string;
+  apiUrl: string;
+  token: string;
+};
+
 export class GitLabService {
-  private token: string;
-  private baseUrl: string;
+  private __api?: GitlabApi;
+  private __cache?: GitlabCache;
 
-  constructor(token: string, baseUrl?: string) {
-    if (!token) {
-      throw new Error('GitLab token is required');
-    }
+  public apiUrl: string;
+  private __token: string;
+  public id: string;
+  public name: string;
 
-    this.token = token;
-    this.baseUrl = baseUrl || GITLAB_BASE;
+  constructor(config: GitlabInstanceConfig) {
+    this.apiUrl = config.apiUrl;
+    this.__token = config.token;
+    this.id = config.id;
+    this.name = config.name;
   }
 
-  private async api(endpoint: string, method: string, body?: Record<string, unknown>) {
-    const response = await fetch(`${this.baseUrl}/api/v4/${endpoint}`, {
-      method,
-      headers: {
-        Authorization: `Bearer ${this.token}`,
-        'Content-Type': 'application/json',
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-
-    if (!response.ok) {
-      throw new Error(`GitLab API error: ${response.statusText}`);
+  get api() {
+    if (!this.__api) {
+      this.__api = new GitlabApi(this.__token, this.apiUrl);
     }
 
-    return response.json();
+    return this.__api;
+  }
+
+  get cache() {
+    if (!this.__cache) {
+      this.__cache = new GitlabCache();
+    }
+
+    return this.__cache;
   }
 
   getApiHostname() {
-    const url = new URL(this.baseUrl);
-    return url.hostname;
+    return this.api.getApiHostname();
   }
 
   async getMREnvironments(projectId: string | number, ref: string) {
-    return this.api(`projects/${projectId}/environments?search=${encodeURIComponent(ref)}`, 'GET');
+    return this.api.getMREnvironments(projectId, ref);
   }
 
-  async getMRByUrl(url: string) {
-    return this.api(mrToApiUrl(this.getApiHostname(), url), 'GET');
+  async getMRList(projectId: string | number): Promise<MergeRequest[]> {
+    const cached = this.cache.get<MergeRequest[]>(projectId);
+    if (cached) return cached;
+
+    const data = await this.api.getMRList(projectId);
+    this.cache.set(projectId, data);
+
+    return data;
   }
 
-  async getMRReviewApp(projectId: string | number, ref: string) {
+  async getMRByUrl(url: string): Promise<MergeRequest> {
+    const { projectId, mrIid } = extractMRFromUrl(url, this.getApiHostname());
+
+    const cached = this.cache.get<MergeRequest>(projectId, mrIid);
+    if (cached) return cached;
+
+    const data = await this.api.getMRById(projectId, mrIid);
+    this.cache.updateMR(data);
+
+    return data;
+  }
+
+  async getMRReviewApp(projectId: string | number, ref: string): Promise<Environment | undefined> {
     const envs = await this.getMREnvironments(projectId, ref);
 
     return envs.find((env: { external_url?: string }) => env.external_url);
   }
 
-  async mergeMR(projectId: string | number, mrIid: string | number) {
-    return this.api(`projects/${projectId}/merge_requests/${mrIid}/merge`, 'PUT');
+  async mergeMR(projectId: string | number, mrIid: string | number): Promise<MergeRequest> {
+    const data = await this.api.mergeMR(projectId, mrIid);
+    this.cache.updateMR(data);
+
+    return data;
   }
 
-  async closeMR(projectId: string | number, mrIid: string | number) {
-    return this.api(`projects/${projectId}/merge_requests/${mrIid}`, 'PUT', { state_event: 'close' });
+  async closeMR(projectId: string | number, mrIid: string | number): Promise<MergeRequest> {
+    const data = await this.api.closeMR(projectId, mrIid);
+    this.cache.updateMR(data);
+
+    return data;
   }
 }

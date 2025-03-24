@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { formatRelative } from 'date-fns';
 import {
   useInteractions,
   useFloating,
@@ -13,108 +12,17 @@ import {
   FloatingFocusManager,
 } from '@floating-ui/react';
 // import { gitlabItemsStorage } from '@extension/storage';
-import type { GitLabService } from '@extension/shared';
 import { MergeRequestCard } from '@extension/ui';
 
-import type { MergeRequestData, Environment } from './types';
-
-// async function gitlabFactory(id: string) {
-//   const item = await gitlabItemsStorage.findById(id)
-//   const token = item?.token;
-//   const apiUrl = item?.apiUrl;
-//
-//   if (token && apiUrl) {
-//     return new GitLabService(token, apiUrl);
-//   }
-// }
-
-function useGitlab() {
-  const gitlabRef = useRef<GitLabService | null>(null);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    // gitlabFactory()
-    //   .then(gitlab => {
-    //     gitlabRef.current = gitlab;
-    //     setLoaded(true);
-    //   })
-    //   .catch(err => {
-    //     console.log({ err });
-    //   });
-    setLoaded(true);
-  }, []);
-
-  return loaded ? gitlabRef.current : null;
-}
-
-function transformMRData(data: MergeRequestData, envData?: Environment) {
-  if (!data) {
-    console.log('transformMRData', data);
-    return null;
-  }
-
-  const reviewApp = {
-    url: envData?.external_url,
-    slug: envData?.slug,
-    state: envData?.state,
-  };
-
-  const mergeBlockers = [];
-
-  if (data?.merge_error) {
-    mergeBlockers.push(data.merge_error);
-  }
-
-  return {
-    projectId: data.project_id,
-    iid: data.iid,
-    title: data.title || '',
-    description: data.description,
-    author: {
-      name: data.author.name,
-      avatar: data.author.avatar_url,
-    },
-    pipeline: data.pipeline
-      ? {
-          status: data.pipeline.status,
-        }
-      : undefined,
-    status: data.state,
-    sourceBranch: data.source_branch,
-    targetBranch: data.target_branch,
-    updatedAt: formatRelative(data.updated_at, new Date()),
-    changesCount: data.changes_count,
-    isDraft: data.draft,
-    isInProgress: data.work_in_progress,
-    hasConflicts: data.has_conflicts,
-    canMerge: data.merge_status === 'can_be_merged',
-    youCanMerge: data.user.can_merge,
-    reviewApp: envData ? reviewApp : undefined,
-    // approvals: {
-    //   approvers: [
-    //     {
-    //       name: 'John Doe',
-    //       avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400',
-    //     },
-    //     {
-    //       name: 'Alice Smith',
-    //       avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
-    //     },
-    //   ],
-    //   required: 2,
-    // },
-
-    mergeBlockers,
-    // mergeBlockers: ['Pipeline is still running', 'Requires 2 approvals (1 more needed)', 'Branch is out of date'],
-  };
-}
-
-type MRInfo = ReturnType<typeof transformMRData>;
+import type { GitLabService } from '@extension/shared';
+import { gitlabBrokerService } from '@extension/shared';
+import type { TransformedMR } from './transformer';
+import { transformMR } from './transformer';
 
 export default function App() {
-  const gitlab = useGitlab();
   const [isOpen, setOpen] = useState(false);
-  const [mrInfo, setMrInfo] = useState<MRInfo | null>(null);
+  const [mr, setMr] = useState<TransformedMR | null>(null);
+  const gitlabRef = useRef<GitLabService | null>(null);
 
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
@@ -138,21 +46,10 @@ export default function App() {
     const handleOpenPopover = async (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const link = target.closest('a');
-      const hostname = gitlab?.getApiHostname();
-
-      if (!gitlab) {
-        return;
-      }
-
-      if (!hostname) {
-        return;
-      }
+      gitlabRef.current = null;
+      setMr(null);
 
       if (!link?.href) {
-        return;
-      }
-
-      if (!link.href.includes(hostname)) {
         return;
       }
 
@@ -160,11 +57,19 @@ export default function App() {
         return;
       }
 
-      if (globalThis.location.hostname == hostname) {
+      const gitlab = await gitlabBrokerService.getInstanceByUrl(link.href);
+
+      if (!gitlab) {
         return;
       }
 
-      setMrInfo(null);
+      gitlabRef.current = gitlab;
+
+      const hostname = gitlab.getApiHostname();
+
+      if (globalThis.location.hostname == hostname) {
+        return;
+      }
 
       refs.setReference(link);
       // link.style.cursor = 'wait';
@@ -187,42 +92,40 @@ export default function App() {
         return;
       }
 
-      const reviewApp = await gitlab.getMRReviewApp(mrData?.pipeline?.project_id, mrData?.pipeline?.ref).catch(err => {
-        console.log('gitlab.getMRReviewApp', err);
-      });
+      const reviewApp = await gitlab.getMRReviewApp(mrData?.pipeline?.project_id, mrData?.pipeline?.ref);
 
-      const data = transformMRData(mrData, reviewApp);
+      const data = transformMR(mrData, reviewApp);
 
-      setMrInfo(data);
+      setMr(data);
       setOpen(true);
     };
 
     document.addEventListener('mouseover', handleOpenPopover);
     return () => document.removeEventListener('mouseover', handleOpenPopover);
-  }, [refs, getReferenceProps, gitlab]);
+  }, [refs, getReferenceProps, gitlabRef.current]);
 
   const handleMerge = async () => {
-    if (mrInfo && gitlab) {
+    if (mr && gitlabRef.current) {
       // handle 405 and json {"message":"405 Method Not Allowed"}
-      await gitlab.mergeMR(mrInfo.projectId, mrInfo.iid);
+      await gitlabRef.current.mergeMR(mr.projectId, mr.iid);
     }
   };
 
   const handleClose = async () => {
-    if (mrInfo && gitlab) {
+    if (mr && gitlabRef.current) {
       // handle 405 and json {"message":"405 Method Not Allowed"}
-      await gitlab.closeMR(mrInfo.projectId, mrInfo.iid);
+      await gitlabRef.current.closeMR(mr.projectId, mr.iid);
     }
   };
 
-  if (isOpen && mrInfo) {
+  if (isOpen && mr) {
     return (
       <FloatingFocusManager context={context} modal={false}>
         <div
           ref={refs.setFloating}
           style={{ ...floatingStyles, zIndex: 9999, outline: 'none' }}
           {...getFloatingProps()}>
-          <MergeRequestCard {...mrInfo} onMerge={handleMerge} onClose={handleClose} />
+          <MergeRequestCard {...mr} onMerge={handleMerge} onClose={handleClose} />
         </div>
       </FloatingFocusManager>
     );
