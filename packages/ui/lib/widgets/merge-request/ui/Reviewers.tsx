@@ -7,40 +7,43 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@extension/ui';
+} from '../../../../index';
 
-interface Approver {
+interface Reviewer {
   name: string;
   avatar: string;
 }
 
-interface ApprovalsProps {
-  approvers: Approver[];
-  requiredApprovals: number;
+interface ReviewersProps {
+  reviewers: Reviewer[];
 }
 
-export const Approvals: FC<ApprovalsProps> = ({ approvers, requiredApprovals }) => {
+export const Reviewers: FC<ReviewersProps> = ({ reviewers = [] }) => {
+  if (!reviewers?.length) {
+    return null
+  }
+
   return (
     <div className="flex items-center gap-2">
       <div className="flex -space-x-2">
         <TooltipProvider>
-          {approvers.map(approver => (
-            <Tooltip key={approver.name}>
+          {reviewers.map(reviewer => (
+            <Tooltip key={reviewer.name}>
               <TooltipTrigger asChild>
                 <Avatar className="size-6">
-                  <AvatarImage src={approver.avatar} alt={approver.name} />
-                  <AvatarFallback>{approver.name[0]}</AvatarFallback>
+                  <AvatarImage src={reviewer.avatar} alt={reviewer.name} />
+                  <AvatarFallback>{reviewer.name[0]}</AvatarFallback>
                 </Avatar>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Approved by {approver.name}</p>
+                <p>Reviewer {reviewer.name}</p>
               </TooltipContent>
             </Tooltip>
           ))}
         </TooltipProvider>
       </div>
       <span className="text-muted-foreground text-sm">
-        {approvers.length}/{requiredApprovals} approvals
+        {reviewers.length} reviewers
       </span>
     </div>
   );

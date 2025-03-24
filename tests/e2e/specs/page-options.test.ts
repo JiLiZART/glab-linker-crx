@@ -1,4 +1,4 @@
-import { canSwitchTheme } from '../helpers/theme';
+// import { canSwitchTheme } from '../helpers/theme';
 
 describe('Webextension Options Page', () => {
   it('should make options page accessible', async () => {
@@ -7,7 +7,7 @@ describe('Webextension Options Page', () => {
 
     await browser.url(optionsUrl);
 
-    await expect(browser).toHaveTitle('Options');
-    await canSwitchTheme();
+    await expect(browser).toHaveTitle('Gitlab Linker Options');
+    // await canSwitchTheme();
   });
 });

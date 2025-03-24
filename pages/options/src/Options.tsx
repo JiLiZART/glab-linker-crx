@@ -1,68 +1,76 @@
 import { useState } from 'react';
+import { nanoid } from 'nanoid';
+import { Sidebar } from './settings/Sidebar';
+import { GitLabInstanceSettings } from './settings/GitLabInstanceSettings';
+import { URLPatternSettings } from './settings/URLPatternSettings';
+import { DisplaySettings } from './settings/DisplaySettings';
+import { PositionSettings } from './settings/PositionSettings';
+import { AdvancedSettings } from './settings/AdvancedSettings';
 import { useForm, FormProvider } from 'react-hook-form';
-import { Button } from '@extension/ui';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { gitlabTokenStorage, gitlabApiUrlStorage } from '@extension/storage';
-import { ApiUrlInput } from './ui/ApiUrlInput';
-import { ApiTokenInput } from './ui/ApiTokenInput';
+import type { GitlabItemsStorage } from '@extension/storage';
+import { gitlabItemsStorage } from '@extension/storage';
+
 import '@src/Options.css';
+import { Actions } from './settings/Actions';
 
 type FormValues = {
   apiUrl: string;
-  gitlabToken: string;
+  token: string;
 };
 
 const Options = () => {
-  const gitlabToken = useStorage(gitlabTokenStorage);
-  const apiUrl = useStorage(gitlabApiUrlStorage);
+  const [menuItems, setMenuItems] = useState<Array<{ name: string; id: string }>>([
+    { name: 'gitlab.com', id: 'gitlab.com' },
+    { name: 'company.gitlab.com', id: 'company.gitlab.com' },
+  ]);
+  const [saved, setSaved] = useState(false);
+  const token = '';
+  const apiUrl = '';
+  const gitlabItems = useStorage<GitlabItemsStorage>(gitlabItemsStorage);
+  // const apiUrl = useStorage(gitlabApiUrlStorage);
   const methods = useForm<FormValues>({
     defaultValues: {
       apiUrl,
-      gitlabToken,
+      token,
     },
   });
 
-  const [saved, setSaved] = useState(false);
+  const onSubmit = async (values: FormValues) => {
+    // const { apiUrl, token } = data;
 
-  const onSubmit = async (data: FormValues) => {
-    const { apiUrl, gitlabToken } = data;
+    console.log({ values });
 
-    await gitlabTokenStorage.setToken(gitlabToken);
-    await gitlabApiUrlStorage.setUrl(apiUrl);
+    // await gitlabTokenStorage.setToken(gitlabToken);
+    // await gitlabApiUrlStorage.setUrl(apiUrl);
 
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
+  const onAddItem = () => {
+    setMenuItems([...menuItems, { name: 'New Instance', id: nanoid() }]);
+    console.log({ gitlabItems });
+    // gitlabItems.addItem('New Instance');
+  };
+
+  const onShowItem = (id: string) => {
+    setMenuItems(menuItems.filter(item => item.id !== id));
+  };
+
   return (
     <FormProvider {...methods}>
-      <form
-        onSubmit={methods.handleSubmit(onSubmit)}
-        className="flex min-h-screen flex-col items-center bg-slate-50 p-8">
-        <div className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-lg">
-          <h1 className="mb-6 text-2xl font-bold text-gray-800">Gitlab Linker Options</h1>
+      <form onSubmit={methods.handleSubmit(onSubmit)} className="flex min-h-screen w-full bg-gray-50">
+        <div className="mx-auto flex w-full max-w-6xl gap-6">
+          <Sidebar menuItems={menuItems} onAddItem={onAddItem} onShowItem={onShowItem} />
+          <div className="flex-1 space-y-6 py-6 pr-6">
+            <GitLabInstanceSettings />
+            <URLPatternSettings />
+            <DisplaySettings />
+            <PositionSettings />
+            <AdvancedSettings />
 
-          <ApiUrlInput />
-
-          <ApiTokenInput />
-
-          <div className="flex items-center gap-4">
-            <Button
-              type="submit"
-              className="rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none">
-              Save
-            </Button>
-            {saved && <span className="text-sm font-medium text-green-500">Successfully saved!</span>}
-          </div>
-
-          <div className="mt-6 rounded-md bg-gray-50 p-4">
-            <h2 className="mb-2 text-sm font-medium text-gray-700">Required permission for token:</h2>
-            <ul className="list-inside list-disc text-sm text-gray-600">
-              <li>read_api</li>
-              <li>read_user</li>
-              <li>read_repository</li>
-              <li>write_repository</li>
-            </ul>
+            <Actions saved={saved} />
           </div>
         </div>
       </form>

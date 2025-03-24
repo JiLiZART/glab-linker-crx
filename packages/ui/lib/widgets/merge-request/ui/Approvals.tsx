@@ -7,32 +7,33 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@extension/ui';
+} from '../../../../index';
 
-interface Reviewer {
+interface Approver {
   name: string;
   avatar: string;
 }
 
-interface ReviewersProps {
-  reviewers: Reviewer[];
+interface ApprovalsProps {
+  approvers: Approver[];
+  requiredApprovals: number;
 }
 
-export const Reviewers: FC<ReviewersProps> = ({ reviewers }) => {
+export const Approvals: FC<ApprovalsProps> = ({ approvers, requiredApprovals }) => {
   return (
     <div className="flex items-center gap-2">
       <div className="flex -space-x-2">
         <TooltipProvider>
-          {reviewers.map(reviewer => (
-            <Tooltip key={reviewer.name}>
+          {approvers.map(approver => (
+            <Tooltip key={approver.name}>
               <TooltipTrigger asChild>
                 <Avatar className="size-6">
-                  <AvatarImage src={reviewer.avatar} alt={reviewer.name} />
-                  <AvatarFallback>{reviewer.name[0]}</AvatarFallback>
+                  <AvatarImage src={approver.avatar} alt={approver.name} />
+                  <AvatarFallback>{approver.name[0]}</AvatarFallback>
                 </Avatar>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Reviewer assigned by {reviewer.name}</p>
+                <p>Approved by {approver.name}</p>
               </TooltipContent>
             </Tooltip>
           ))}
