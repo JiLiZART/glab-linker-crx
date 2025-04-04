@@ -65,6 +65,10 @@ export class GitLabService {
     return this.api.getApiHostname();
   }
 
+  async getProjects() {
+    return this.api.getProjects();
+  }
+
   async getMREnvironments(projectId: string | number, ref: string) {
     return this.api.getMREnvironments(projectId, ref);
   }

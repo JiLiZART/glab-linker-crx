@@ -4,6 +4,14 @@ export const GITLAB_BASE = 'https://gitlab.com';
 
 // ${encodeURIComponent(projectId)}
 
+function tryJSONParse(value: string) {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
+
 export class GitlabApi {
   private token: string;
   private baseUrl: string;
@@ -28,7 +36,7 @@ export class GitlabApi {
     });
 
     if (!response.ok) {
-      throw new Error(`GitLab API error: ${response.statusText}`);
+      throw new Error(`GitLab API error: ${response.statusText}`, { cause: tryJSONParse(await response.text()) });
     }
 
     return response.json();
@@ -37,6 +45,10 @@ export class GitlabApi {
   getApiHostname() {
     const url = new URL(this.baseUrl);
     return url.hostname;
+  }
+
+  async getProjects() {
+    return this.api<unknown[]>('projects', 'GET');
   }
 
   async getMREnvironments(projectId: string | number, ref: string) {

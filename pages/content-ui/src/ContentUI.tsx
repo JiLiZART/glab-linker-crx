@@ -10,11 +10,11 @@ import {
   useDismiss,
   useRole,
   FloatingFocusManager,
+  useClientPoint,
 } from '@floating-ui/react';
 // import { gitlabItemsStorage } from '@extension/storage';
 import { MergeRequestCard } from '@extension/ui';
 
-import type { GitLabService } from '@extension/shared';
 import { gitlabBrokerService } from '@extension/shared';
 import type { TransformedMR } from './transformer';
 import { transformMR } from './transformer';
@@ -40,7 +40,10 @@ function getLinkUrl(link: HTMLAnchorElement) {
 export default function ContentUI() {
   const [isOpen, setOpen] = useState(false);
   const [mr, setMr] = useState<TransformedMR | null>(null);
-  const gitlabRef = useRef<GitLabService | null>(null);
+  const actionsRef = useRef<{
+    onMerge: () => Promise<void>;
+    onClose: () => Promise<void>;
+  } | null>(null);
 
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
@@ -52,44 +55,47 @@ export default function ContentUI() {
   // const click = useClick(context);
   const dismiss = useDismiss(context);
   const role = useRole(context);
+  const clientPoint = useClientPoint(context);
 
   // const isClick = false;
 
   const isPrecacheAll = true;
 
   // Merge all the interactions into prop getters
-  const { getReferenceProps, getFloatingProps } = useInteractions([dismiss, role]);
+  const { getReferenceProps, getFloatingProps } = useInteractions([dismiss, clientPoint, role]);
 
   useEffect(() => {
     if (isPrecacheAll) {
       iterateLinks(el => {
         const url = getLinkUrl(el);
 
-        gitlabBrokerService.getInstanceByUrl();
+        if (!url) {
+          return;
+        }
+
+        gitlabBrokerService.precacheByUrl(url);
       });
     }
 
     const handleOpenPopover = async (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const link = target.closest('a');
-      gitlabRef.current = null;
-      setMr(null);
+      const el = target.closest('a');
 
-      if (!link?.href) {
+      if (!el) {
         return;
       }
 
-      if (!link.href.includes('/merge_requests/')) {
+      const url = getLinkUrl(el);
+
+      if (!url) {
         return;
       }
 
-      const gitlab = await gitlabBrokerService.getInstanceByUrl(link.href);
+      const gitlab = await gitlabBrokerService.getInstanceByUrl(url);
 
       if (!gitlab) {
         return;
       }
-
-      gitlabRef.current = gitlab;
 
       const hostname = gitlab.getApiHostname();
 
@@ -97,21 +103,9 @@ export default function ContentUI() {
         return;
       }
 
-      refs.setReference(link);
-      // link.style.cursor = 'wait';
-      // link.title = '';
-
-      Object.entries(getReferenceProps()).forEach(([key, value]) => {
-        if (key.startsWith('aria-')) {
-          link.setAttribute(key, value as string);
-        }
-      });
-
-      const mrData = await gitlab.getMRByUrl(link.href).catch(err => {
+      const mrData = await gitlab.getMRByUrl(url).catch(err => {
         console.log('gitlab.getMRByUrl', err);
       });
-
-      link.style.cursor = '';
 
       if (!mrData) {
         console.error('glab-linker-crx: failed to fetch MR info');
@@ -120,28 +114,39 @@ export default function ContentUI() {
 
       const reviewApp = await gitlab.getMRReviewApp(mrData?.pipeline?.project_id, mrData?.pipeline?.ref);
 
-      const data = transformMR(mrData, reviewApp);
+      const mr = transformMR(mrData, reviewApp);
 
-      setMr(data);
+      if (mr) {
+        actionsRef.current = {
+          async onMerge() {
+            const mrData = await gitlab.mergeMR(mr.projectId, mr.iid);
+            const newMr = transformMR(mrData, reviewApp);
+
+            setMr(newMr);
+          },
+          async onClose() {
+            const mrData = await gitlab.closeMR(mr.projectId, mr.iid);
+            const newMr = transformMR(mrData, reviewApp);
+
+            setMr(newMr);
+          },
+        };
+      }
+
+      setMr(mr);
       setOpen(true);
     };
 
     document.addEventListener('mouseover', handleOpenPopover);
     return () => document.removeEventListener('mouseover', handleOpenPopover);
-  }, [refs, getReferenceProps, gitlabRef.current]);
+  }, [refs, getReferenceProps, isPrecacheAll, mr]);
 
   const handleMerge = async () => {
-    if (mr && gitlabRef.current) {
-      // handle 405 and json {"message":"405 Method Not Allowed"}
-      await gitlabRef.current.mergeMR(mr.projectId, mr.iid);
-    }
+    actionsRef.current?.onMerge();
   };
 
   const handleClose = async () => {
-    if (mr && gitlabRef.current) {
-      // handle 405 and json {"message":"405 Method Not Allowed"}
-      await gitlabRef.current.closeMR(mr.projectId, mr.iid);
-    }
+    actionsRef.current?.onClose();
   };
 
   if (isOpen && mr) {

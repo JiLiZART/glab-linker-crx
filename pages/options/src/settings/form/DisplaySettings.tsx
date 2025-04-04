@@ -88,7 +88,7 @@ export const DisplaySettings = ({ control }: { control: OptionsFormControl }) =>
                   onCheckedChange={field.onChange}
                   onBlur={field.onBlur}
                   checked={field.value}
-                  defaultChecked={field.value}
+                  defaultChecked={true}
                 />
                 <label htmlFor="show-description" className="text-sm font-medium">
                   Show description
@@ -108,7 +108,7 @@ export const DisplaySettings = ({ control }: { control: OptionsFormControl }) =>
                   onCheckedChange={field.onChange}
                   onBlur={field.onBlur}
                   checked={field.value}
-                  defaultChecked={field.value}
+                  defaultChecked={true}
                 />
                 <label htmlFor="show-avatar" className="text-sm font-medium">
                   Show avatar
@@ -128,7 +128,7 @@ export const DisplaySettings = ({ control }: { control: OptionsFormControl }) =>
                   onCheckedChange={field.onChange}
                   onBlur={field.onBlur}
                   checked={field.value}
-                  defaultChecked={field.value}
+                  defaultChecked={true}
                 />
                 <label htmlFor="show-merge" className="text-sm font-medium">
                   Show merge buttons

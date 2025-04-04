@@ -8,6 +8,8 @@ import { useForm, FormProvider } from 'react-hook-form';
 import type { OptionsFormValues } from '@src/types';
 import { useState } from 'react';
 
+const NOT_AUTHORIZED_ERROR = '401 Unauthorized';
+
 function timeout(time: number) {
   return new Promise(resolve => {
     setTimeout(resolve, time);
@@ -21,25 +23,35 @@ export type OptionsFormProps = {
 
 export const OptionsForm = (props: OptionsFormProps) => {
   const { onSave, defaultValues } = props;
-  const [saved, setSaved] = useState(false);
   const methods = useForm<OptionsFormValues>({
     defaultValues: defaultValues,
+    shouldFocusError: true,
+    reValidateMode: 'onChange',
   });
-  const { handleSubmit, control } = methods;
+  const [saved, setSaved] = useState(false);
+  const { handleSubmit, formState, control } = methods;
 
   const onSubmit = async (values: OptionsFormValues) => {
-    // const { apiUrl, token } = data;
-
     console.log({ values });
 
     // await gitlabTokenStorage.setToken(gitlabToken);
     // await gitlabApiUrlStorage.setUrl(apiUrl);
 
-    setSaved(true);
-    await timeout(2000);
-    setSaved(false);
+    try {
+      await onSave(values);
+      setSaved(true);
+      await timeout(1000);
+    } catch (err) {
+      console.log({ err });
+      const cause = (err instanceof Error && err?.cause) as { message: string } | undefined;
 
-    await onSave();
+      if (cause?.message === NOT_AUTHORIZED_ERROR) {
+        methods.setError('token', { type: 'manual', message: 'Invalid token' }, { shouldFocus: true });
+        return;
+      }
+    } finally {
+      setSaved(false);
+    }
   };
 
   return (

@@ -13,8 +13,10 @@ const SidebarHeader = () => {
   );
 };
 
-const MenuItem = (props: { children: React.ReactNode; id: string } & Pick<SidebarProps, 'onViewItem'>) => {
-  const { children, id, onViewItem } = props;
+const MenuItem = (
+  props: { children: React.ReactNode; id: string; active: boolean } & Pick<SidebarProps, 'onViewItem'>,
+) => {
+  const { children, id, active, onViewItem } = props;
 
   const onClick = () => {
     onViewItem(id);
@@ -24,7 +26,7 @@ const MenuItem = (props: { children: React.ReactNode; id: string } & Pick<Sideba
     <Button
       onClick={onClick}
       variant="ghost"
-      className="h-9 w-full justify-start rounded-lg text-sm font-normal hover:bg-gray-100">
+      className={`h-9 w-full justify-start rounded-lg text-sm ${active ? 'font-bold' : 'font-normal'} hover:bg-gray-100`}>
       {children}
     </Button>
   );
@@ -51,13 +53,14 @@ const MenuHeader = ({ children }: { children: React.ReactNode }) => {
 };
 
 export type SidebarProps = {
-  onAddItem: () => void;
-  onViewItem: (id: string) => void;
+  activeId?: string;
+  onAddItem?: () => Promise<void>;
+  onViewItem?: (id: string) => void;
   items: Array<{ name: string; id: string }>;
 };
 
 export const Sidebar = (props: SidebarProps) => {
-  const { onAddItem, onViewItem, items = [] } = props;
+  const { onAddItem, onViewItem, activeId, items = [] } = props;
 
   return (
     <div className="min-h-screen w-64 shrink-0 border-r bg-white">
@@ -68,7 +71,7 @@ export const Sidebar = (props: SidebarProps) => {
         <MenuHeader>GitLab Instances</MenuHeader>
         <div className="space-y-1">
           {items.map(item => (
-            <MenuItem key={item.id} id={item.id} onViewItem={onViewItem}>
+            <MenuItem key={item.id} id={item.id} active={item.id === activeId} onViewItem={onViewItem}>
               {item.name}
             </MenuItem>
           ))}

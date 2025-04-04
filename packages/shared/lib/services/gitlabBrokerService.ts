@@ -5,6 +5,10 @@ import { GitLabService } from './gitlabService';
 class GitlabBrokerService {
   private instanceCache: Map<string, GitLabService> = new Map();
 
+  async precacheByUrl(url: string) {}
+
+  async fetchMRByUrl(url: string) {}
+
   // Get instance by host url
   async getInstanceByUrl(url: string): Promise<GitLabService | null> {
     const host = this.extractHostname(url);
@@ -17,14 +21,13 @@ class GitlabBrokerService {
 
     // Try to find in storage
     const items = await gitlabItemsStorage.get();
-    const config = items.find((item: GitlabConfigItem) => item.apiUrl?.includes(host));
+    const config = items.find((item: GitlabConfigItem) => item.form?.hostname?.includes(host));
 
-    if (!config?.apiUrl || !config.token) {
+    if (!config?.form?.token) {
       return null;
     }
 
     const instance = this.createInstance(config);
-    this.cacheInstance(instance);
 
     return instance;
   }
@@ -38,7 +41,7 @@ class GitlabBrokerService {
     }
 
     const config = await gitlabItemsStorage.findById(id);
-    if (!config?.apiUrl || !config.token) {
+    if (!config?.form?.token) {
       return null;
     }
 
@@ -48,13 +51,17 @@ class GitlabBrokerService {
     return instance;
   }
 
-  private createInstance(config: GitlabConfigItem) {
-    return new GitLabService({
+  createInstance(config: GitlabConfigItem) {
+    const instance = new GitLabService({
       id: config.id,
       name: config.name,
-      apiUrl: config.apiUrl!,
-      token: config.token!,
+      apiUrl: config?.form?.hostname || '',
+      token: config?.form?.token || '',
     });
+
+    this.cacheInstance(instance);
+
+    return instance;
   }
 
   private cacheInstance(instance: GitLabService): void {

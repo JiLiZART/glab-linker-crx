@@ -24,7 +24,7 @@ Example:
 *.gitlab.com
 company.gitlab.com/*"
                 className="h-[120px] font-mono text-sm"
-                defaultValue="*"
+                // defaultValue="*"
               />
               <p className="mt-2 text-sm text-gray-600">Default is * (matches all URLs)</p>
             </div>

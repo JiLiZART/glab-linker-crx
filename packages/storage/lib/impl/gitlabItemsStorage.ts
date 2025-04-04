@@ -8,22 +8,30 @@ export type GitlabConfigItem = {
   name: string;
 
   form?: {
-    token: string;
-    hostname: string;
+    token?: string;
+    hostname?: string;
     prefetchLinks?: boolean;
     showDescription?: boolean;
     showAvatar?: boolean;
     showMerge?: boolean;
 
-    position: 'left-top' | 'right-top' | 'left-bottom' | 'right-bottom' | 'near-cursor';
+    position?: 'left-top' | 'right-top' | 'left-bottom' | 'right-bottom' | 'near-cursor';
 
-    whitelist: string;
-    blacklist: string;
+    whitelist?: string;
+    blacklist?: string;
   };
 };
 
+function tryJSONParse(value: string) {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
+
 export type GitlabItemsStorage = BaseStorage<GitlabConfigItem[]> & {
-  addItem: (name: string) => Promise<void>;
+  addItem: (name: string, form?: GitlabConfigItem['form']) => Promise<GitlabConfigItem>;
   findById: (id: string) => Promise<GitlabConfigItem | undefined>;
   setForId: (id: string, data: Partial<GitlabConfigItem>) => Promise<void>;
   getItems: () => Promise<GitlabConfigItem[]>;
@@ -33,21 +41,48 @@ const storage = createStorage<GitlabConfigItem[]>('glab-items', [], {
   storageEnum: StorageEnum.Local,
   liveUpdate: true,
   serialization: {
-    serialize: JSON.stringify,
-    deserialize: JSON.parse,
+    serialize(value) {
+      debugger;
+      return JSON.stringify(value);
+    },
+    deserialize(text) {
+      debugger;
+      return tryJSONParse(text);
+    },
   },
 });
 
 export const gitlabItemsStorage: GitlabItemsStorage = {
   ...storage,
-  addItem: async (name: string) => {
+  addItem: async (name: string, form?: GitlabConfigItem['form']) => {
     const items = await storage.get();
+    const newItem = { id: nanoid(), name, form };
 
-    await storage.set([...items, { id: nanoid(), name }]);
+    await storage.set([...items, newItem]);
+
+    return newItem;
   },
 
   getItems: async () => {
-    return await storage.get();
+    const items = await storage.get();
+
+    if (!items?.length) {
+      const defaultItems = [
+        {
+          name: 'gitlab.com',
+          id: 'gitlab.com',
+          form: {
+            hostname: 'https://gitlab.com',
+          },
+        },
+      ];
+
+      await storage.set(defaultItems);
+
+      return defaultItems;
+    }
+
+    return items;
   },
 
   findById: async (id: string) => {
@@ -61,7 +96,7 @@ export const gitlabItemsStorage: GitlabItemsStorage = {
     const item = items.find(item => item.id === id);
 
     if (item) {
-      await storage.set([...items.filter(item => item.id !== id), { ...item, ...data }]);
+      await storage.set([...items.filter(item => item.id !== id), { ...item, ...data, id }]);
     }
   },
 };

@@ -2,33 +2,47 @@ import { Card, Input } from '@extension/ui';
 import { ExternalLink } from 'lucide-react';
 import type { OptionsFormControl } from '@src/types';
 import { Controller } from 'react-hook-form';
+import { useFormValues } from '@src/form';
+
+const Header = () => {
+  const values = useFormValues();
+
+  if (values.hostname) {
+    return (
+      <h2 className="mb-4 text-lg font-semibold">GitLab Instance Settings {values.hostname.replace('https://', '')}</h2>
+    );
+  }
+
+  return <h2 className="mb-4 text-lg font-semibold">GitLab Instance Settings</h2>;
+};
+
+const requiredScopes = ['api', 'read_repository', 'write_repository', 'read_api'];
 
 export const GitLabInstanceSettings = ({ control }: { control: OptionsFormControl }) => {
-  const requiredScopes = ['api', 'read_repository', 'write_repository', 'read_api'];
-
   return (
     <Card className="p-6">
-      <h2 className="mb-4 text-lg font-semibold">GitLab Instance Settings</h2>
+      <Header />
       <div className="space-y-4">
         <Controller
           name="hostname"
-          rules={{ required: true }}
+          rules={{ required: 'This field is required' }}
           control={control}
-          render={({ field }) => (
+          render={({ field, formState: { errors } }) => (
             <div>
               <label htmlFor="hostname" className="mb-1 block text-sm font-medium">
                 Hostname
               </label>
-              <Input {...field} name="hostname" placeholder="e.g. gitlab.com" />
+              <Input {...field} name="hostname" type="url" placeholder="e.g. gitlab.com" />
+              {errors?.hostname?.message && <p className="mt-2 text-sm text-red-600">{errors.hostname.message}</p>}
             </div>
           )}
         />
 
         <Controller
           name="token"
-          rules={{ required: true }}
+          rules={{ required: 'This field is required' }}
           control={control}
-          render={({ field }) => (
+          render={({ field, formState: { errors } }) => (
             <div>
               <label htmlFor="token" className="mb-1 block text-sm font-medium">
                 Access Token
@@ -44,6 +58,7 @@ export const GitLabInstanceSettings = ({ control }: { control: OptionsFormContro
                   <ExternalLink className="ml-1 size-3" />
                 </a>
               </div>
+              {errors?.token?.message && <p className="mt-2 text-sm text-red-600">{errors.token.message}</p>}
             </div>
           )}
         />
