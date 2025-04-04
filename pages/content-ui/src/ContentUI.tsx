@@ -6,7 +6,7 @@ import {
   shift,
   flip,
   autoUpdate,
-  useClick,
+  // useClick,
   useDismiss,
   useRole,
   FloatingFocusManager,
@@ -19,7 +19,25 @@ import { gitlabBrokerService } from '@extension/shared';
 import type { TransformedMR } from './transformer';
 import { transformMR } from './transformer';
 
-export default function App() {
+function iterateLinks(cb: (el: HTMLAnchorElement) => void) {
+  document.querySelectorAll('a').forEach(item => {
+    cb(item);
+  });
+}
+
+function getLinkUrl(link: HTMLAnchorElement) {
+  if (!link?.href) {
+    return null;
+  }
+
+  if (!link.href.includes('/merge_requests/')) {
+    return null;
+  }
+
+  return link.href;
+}
+
+export default function ContentUI() {
   const [isOpen, setOpen] = useState(false);
   const [mr, setMr] = useState<TransformedMR | null>(null);
   const gitlabRef = useRef<GitLabService | null>(null);
@@ -31,18 +49,26 @@ export default function App() {
     whileElementsMounted: autoUpdate,
   });
 
-  const click = useClick(context);
+  // const click = useClick(context);
   const dismiss = useDismiss(context);
   const role = useRole(context);
 
-  const isClick = false;
+  // const isClick = false;
 
-  const interactions = [isClick && click, dismiss, role].filter(item => Boolean(item));
+  const isPrecacheAll = true;
 
   // Merge all the interactions into prop getters
-  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
+  const { getReferenceProps, getFloatingProps } = useInteractions([dismiss, role]);
 
   useEffect(() => {
+    if (isPrecacheAll) {
+      iterateLinks(el => {
+        const url = getLinkUrl(el);
+
+        gitlabBrokerService.getInstanceByUrl();
+      });
+    }
+
     const handleOpenPopover = async (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const link = target.closest('a');

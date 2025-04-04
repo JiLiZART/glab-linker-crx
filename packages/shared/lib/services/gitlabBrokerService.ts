@@ -1,4 +1,4 @@
-import type { GitlabItemStorageConfig } from '@extension/storage';
+import type { GitlabConfigItem } from '@extension/storage';
 import { gitlabItemsStorage } from '@extension/storage';
 import { GitLabService } from './gitlabService';
 
@@ -17,7 +17,7 @@ class GitlabBrokerService {
 
     // Try to find in storage
     const items = await gitlabItemsStorage.get();
-    const config = items.find((item: GitlabItemStorageConfig) => item.apiUrl?.includes(host));
+    const config = items.find((item: GitlabConfigItem) => item.apiUrl?.includes(host));
 
     if (!config?.apiUrl || !config.token) {
       return null;
@@ -48,7 +48,7 @@ class GitlabBrokerService {
     return instance;
   }
 
-  private createInstance(config: GitlabItemStorageConfig) {
+  private createInstance(config: GitlabConfigItem) {
     return new GitLabService({
       id: config.id,
       name: config.name,

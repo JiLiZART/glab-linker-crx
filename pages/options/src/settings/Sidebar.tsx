@@ -1,21 +1,23 @@
 import { Button } from '@extension/ui';
 import { Plus, Server } from 'lucide-react';
 
+const title = 'Gitlab Linker';
+
 const SidebarHeader = () => {
   return (
     <div className="mb-1 flex items-center gap-2 px-2">
       <img src="/icon.svg" className="size-10 text-gray-500" alt="Gitlab MR Linker Options" />
 
-      <h2 className="text-sm font-semibold">Gitlab Linker</h2>
+      <h2 className="text-sm font-semibold">{title}</h2>
     </div>
   );
 };
 
-const MenuItem = (props: { children: React.ReactNode; id: string } & Pick<SidebarProps, 'onShowItem'>) => {
-  const { children, id, onShowItem } = props;
+const MenuItem = (props: { children: React.ReactNode; id: string } & Pick<SidebarProps, 'onViewItem'>) => {
+  const { children, id, onViewItem } = props;
 
   const onClick = () => {
-    onShowItem(id);
+    onViewItem(id);
   };
 
   return (
@@ -50,12 +52,12 @@ const MenuHeader = ({ children }: { children: React.ReactNode }) => {
 
 export type SidebarProps = {
   onAddItem: () => void;
-  onShowItem: (id: string) => void;
-  menuItems: Array<{ name: string; id: string }>;
+  onViewItem: (id: string) => void;
+  items: Array<{ name: string; id: string }>;
 };
 
 export const Sidebar = (props: SidebarProps) => {
-  const { onAddItem, onShowItem, menuItems = [] } = props;
+  const { onAddItem, onViewItem, items = [] } = props;
 
   return (
     <div className="min-h-screen w-64 shrink-0 border-r bg-white">
@@ -65,8 +67,8 @@ export const Sidebar = (props: SidebarProps) => {
       <div className="flex flex-col gap-3 p-3">
         <MenuHeader>GitLab Instances</MenuHeader>
         <div className="space-y-1">
-          {menuItems.map(item => (
-            <MenuItem key={item.id} id={item.id} onShowItem={onShowItem}>
+          {items.map(item => (
+            <MenuItem key={item.id} id={item.id} onViewItem={onViewItem}>
               {item.name}
             </MenuItem>
           ))}

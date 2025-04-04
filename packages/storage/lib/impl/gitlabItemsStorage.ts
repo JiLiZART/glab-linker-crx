@@ -1,22 +1,22 @@
+import { nanoid } from 'nanoid';
 import { StorageEnum } from '../base/enums';
 import { createStorage } from '../base/base';
 import type { BaseStorage } from '../base/types';
-import { nanoid } from 'nanoid';
 
-export type GitlabItemStorageConfig = {
+export type GitlabConfigItem = {
   id: string;
   name: string;
   apiUrl?: string;
   token?: string;
 };
 
-export type GitlabItemsStorage = BaseStorage<GitlabItemStorageConfig[]> & {
+export type GitlabItemsStorage = BaseStorage<GitlabConfigItem[]> & {
   addItem: (name: string) => Promise<void>;
-  findById: (id: string) => Promise<GitlabItemStorageConfig | undefined>;
-  setForId: (id: string, data: Partial<GitlabItemStorageConfig>) => Promise<void>;
+  findById: (id: string) => Promise<GitlabConfigItem | undefined>;
+  setForId: (id: string, data: Partial<GitlabConfigItem>) => Promise<void>;
 };
 
-const storage = createStorage<GitlabItemStorageConfig[]>('glab-items', [], {
+const storage = createStorage<GitlabConfigItem[]>('glab-items', [], {
   storageEnum: StorageEnum.Local,
   liveUpdate: true,
   serialization: {
@@ -39,7 +39,7 @@ export const gitlabItemsStorage: GitlabItemsStorage = {
     return items.find(item => item.id === id);
   },
 
-  setForId: async (id: string, data: Partial<GitlabItemStorageConfig>) => {
+  setForId: async (id: string, data: Partial<GitlabConfigItem>) => {
     const items = await storage.get();
     const item = items.find(item => item.id === id);
 

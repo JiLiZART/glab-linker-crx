@@ -1,4 +1,6 @@
 import { Card, Checkbox, MergeRequestCard } from '@extension/ui';
+import type { OptionsFormControl } from '@src/types';
+import { Controller } from 'react-hook-form';
 
 const mergePreviewData = {
   title: 'MR title',
@@ -50,18 +52,32 @@ const mergePreviewData = {
     }),
 };
 
-export const DisplaySettings = () => {
+export const DisplaySettings = ({ control }: { control: OptionsFormControl }) => {
   return (
     <Card className="p-6">
       <h2 className="mb-4 text-lg font-semibold">Display Settings</h2>
       <div className="grid grid-cols-1 gap-6">
         <div className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <Checkbox id="show-description" />
-            <label htmlFor="show-description" className="text-sm font-medium">
-              Show description
-            </label>
-          </div>
+          <Controller
+            name="showDescription"
+            control={control}
+            render={({ field }) => (
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="show-description"
+                  ref={field.ref}
+                  onCheckedChange={field.onChange}
+                  onBlur={field.onBlur}
+                  checked={field.value}
+                  defaultChecked={field.value}
+                />
+                <label htmlFor="show-description" className="text-sm font-medium">
+                  Show description
+                </label>
+              </div>
+            )}
+          />
+
           <div className="flex items-center space-x-2">
             <Checkbox id="show-avatar" />
             <label htmlFor="show-avatar" className="text-sm font-medium">
