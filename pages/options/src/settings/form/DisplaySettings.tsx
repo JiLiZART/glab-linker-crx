@@ -1,4 +1,5 @@
 import { Card, Checkbox, MergeRequestCard } from '@extension/ui';
+import { useFormValues } from '@src/form';
 import type { OptionsFormControl } from '@src/types';
 import { Controller } from 'react-hook-form';
 
@@ -52,6 +53,24 @@ const mergePreviewData = {
     }),
 };
 
+function MergeRequestPreview() {
+  const values = useFormValues();
+
+  return (
+    <div>
+      <h3 className="mb-3 text-sm font-medium">Preview</h3>
+      <div className="bg-gray-50 p-4">
+        <MergeRequestCard
+          {...mergePreviewData}
+          showAvatar={values.showAvatar}
+          showMerge={values.showMerge}
+          showDescription={values.showDescription}
+        />
+      </div>
+    </div>
+  );
+}
+
 export const DisplaySettings = ({ control }: { control: OptionsFormControl }) => {
   return (
     <Card className="p-6">
@@ -78,26 +97,47 @@ export const DisplaySettings = ({ control }: { control: OptionsFormControl }) =>
             )}
           />
 
-          <div className="flex items-center space-x-2">
-            <Checkbox id="show-avatar" />
-            <label htmlFor="show-avatar" className="text-sm font-medium">
-              Show avatar
-            </label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox id="show-merge" />
-            <label htmlFor="show-merge" className="text-sm font-medium">
-              Show merge buttons
-            </label>
-          </div>
-        </div>
-        <div>
-          <h3 className="mb-3 text-sm font-medium">Preview</h3>
+          <Controller
+            name="showAvatar"
+            control={control}
+            render={({ field }) => (
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="show-avatar"
+                  ref={field.ref}
+                  onCheckedChange={field.onChange}
+                  onBlur={field.onBlur}
+                  checked={field.value}
+                  defaultChecked={field.value}
+                />
+                <label htmlFor="show-avatar" className="text-sm font-medium">
+                  Show avatar
+                </label>
+              </div>
+            )}
+          />
 
-          <div className="bg-gray-50 p-4">
-            <MergeRequestCard {...mergePreviewData} />
-          </div>
+          <Controller
+            name="showMerge"
+            control={control}
+            render={({ field }) => (
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="show-merge"
+                  ref={field.ref}
+                  onCheckedChange={field.onChange}
+                  onBlur={field.onBlur}
+                  checked={field.value}
+                  defaultChecked={field.value}
+                />
+                <label htmlFor="show-merge" className="text-sm font-medium">
+                  Show merge buttons
+                </label>
+              </div>
+            )}
+          />
         </div>
+        <MergeRequestPreview />
       </div>
     </Card>
   );

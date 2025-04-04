@@ -55,6 +55,10 @@ interface MergeRequestCardProps {
   };
   onMerge?: () => Promise<unknown>;
   onClose?: () => Promise<unknown>;
+  onRefresh?: () => Promise<unknown>;
+  showAvatar?: boolean;
+  showMerge?: boolean;
+  showDescription?: boolean;
 }
 
 export const MergeRequestCard: FC<MergeRequestCardProps> = ({
@@ -78,6 +82,10 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
   mergeBlockers = [],
   onMerge,
   onClose,
+  onRefresh,
+  showAvatar = true,
+  showMerge = true,
+  showDescription = true,
 }) => {
   const renderMergeButton = () => {
     if (status !== 'opened') {
@@ -140,10 +148,12 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
       <CardHeader className="space-y-4">
         <div className="flex flex-col items-start gap-4">
           <div className="flex items-center gap-2">
-            <Avatar className="border-background size-10 border-2">
-              <AvatarImage src={author.avatar} alt={author.name} />
-              <AvatarFallback>{author.name[0]}</AvatarFallback>
-            </Avatar>
+            {showAvatar && (
+              <Avatar className="border-background size-10 border-2">
+                <AvatarImage src={author.avatar} alt={author.name} />
+                <AvatarFallback>{author.name[0]}</AvatarFallback>
+              </Avatar>
+            )}
             <div className="space-y-1">
               <h3 className="font-semibold leading-none">{title}</h3>
               <p className="text-muted-foreground text-sm">by {author.name}</p>
@@ -154,7 +164,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
             <MergeRequestLabels status={status} isDraft={isDraft} isInProgress={isInProgress} />
           </div>
         </div>
-        <p className="text-muted-foreground text-sm">{description}</p>
+        {showDescription && <p className="text-muted-foreground text-sm">{description}</p>}
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex flex-col gap-4">
@@ -168,12 +178,12 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
       </CardContent>
       <CardFooter className="gap-2">
         <section className="flex w-full flex-row gap-4">
-          {renderMergeButton()}
-          {renderCloseButton()}
+          {showMerge && renderMergeButton()}
+          {showMerge && renderCloseButton()}
           {reviewApp?.url && reviewApp?.slug && reviewApp?.state && status !== 'merged' && (
             <ReviewAppButton state={reviewApp?.state} url={reviewApp?.url} slug={reviewApp?.slug} />
           )}
-          <Button variant="ghost" className="ml-auto">
+          <Button variant="ghost" className="ml-auto" onClick={onRefresh}>
             <RefreshCwIcon />
           </Button>
         </section>

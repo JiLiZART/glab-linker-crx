@@ -6,14 +6,27 @@ import type { BaseStorage } from '../base/types';
 export type GitlabConfigItem = {
   id: string;
   name: string;
-  apiUrl?: string;
-  token?: string;
+
+  form?: {
+    token: string;
+    hostname: string;
+    prefetchLinks?: boolean;
+    showDescription?: boolean;
+    showAvatar?: boolean;
+    showMerge?: boolean;
+
+    position: 'left-top' | 'right-top' | 'left-bottom' | 'right-bottom' | 'near-cursor';
+
+    whitelist: string;
+    blacklist: string;
+  };
 };
 
 export type GitlabItemsStorage = BaseStorage<GitlabConfigItem[]> & {
   addItem: (name: string) => Promise<void>;
   findById: (id: string) => Promise<GitlabConfigItem | undefined>;
   setForId: (id: string, data: Partial<GitlabConfigItem>) => Promise<void>;
+  getItems: () => Promise<GitlabConfigItem[]>;
 };
 
 const storage = createStorage<GitlabConfigItem[]>('glab-items', [], {
@@ -31,6 +44,10 @@ export const gitlabItemsStorage: GitlabItemsStorage = {
     const items = await storage.get();
 
     await storage.set([...items, { id: nanoid(), name }]);
+  },
+
+  getItems: async () => {
+    return await storage.get();
   },
 
   findById: async (id: string) => {
