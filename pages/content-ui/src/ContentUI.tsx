@@ -13,7 +13,7 @@ import {
   useClientPoint,
 } from '@floating-ui/react';
 // import { gitlabItemsStorage } from '@extension/storage';
-import { MergeRequestCard } from '@extension/ui';
+import { Card, MergeRequestCard } from '@extension/ui';
 
 import { gitlabBrokerService } from '@extension/shared';
 import type { TransformedMR } from './transformer';
@@ -103,6 +103,8 @@ export default function ContentUI() {
         return;
       }
 
+      setOpen(true);
+
       const mrData = await gitlab.getMRByUrl(url).catch(err => {
         console.log('gitlab.getMRByUrl', err);
       });
@@ -134,7 +136,6 @@ export default function ContentUI() {
       }
 
       setMr(mr);
-      setOpen(true);
     };
 
     document.addEventListener('mouseover', handleOpenPopover);
@@ -149,14 +150,15 @@ export default function ContentUI() {
     actionsRef.current?.onClose();
   };
 
-  if (isOpen && mr) {
+  if (isOpen) {
     return (
       <FloatingFocusManager context={context} modal={false}>
         <div
           ref={refs.setFloating}
           style={{ ...floatingStyles, zIndex: 9999, outline: 'none' }}
           {...getFloatingProps()}>
-          <MergeRequestCard {...mr} onMerge={handleMerge} onClose={handleClose} />
+          {mr && <MergeRequestCard {...mr} onMerge={handleMerge} onClose={handleClose} />}
+          {!mr && <Card className="w-full max-w-2xl transition-all hover:shadow-lg">Loading...</Card>}
         </div>
       </FloatingFocusManager>
     );
