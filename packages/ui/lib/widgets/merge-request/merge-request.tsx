@@ -1,4 +1,4 @@
-import type { FC, ReactNode } from 'react';
+import { useState, type FC, type ReactNode } from 'react';
 import {
   Card,
   CardContent,
@@ -10,7 +10,7 @@ import {
   Button,
   TooltipButton,
 } from '../../../index';
-import { AlertCircleIcon, CheckIcon, XIcon, RefreshCwIcon, ExternalLinkIcon } from 'lucide-react';
+import { AlertCircleIcon, CheckIcon, XIcon, RefreshCwIcon, ExternalLinkIcon, Merge } from 'lucide-react';
 import { PipelineStatus } from './ui/pipeline-status';
 import { Approvals } from './ui/approvers';
 import { Reviewers } from './ui/reviewers';
@@ -21,6 +21,83 @@ import { ReviewAppButton } from './ui/review-app-button';
 import { Description } from './ui/description';
 import { RefreshButton } from './ui/refresh-button';
 import { DiscussionsBadge } from './ui/discussions-badge';
+
+const MergeButton = (
+  props: Pick<MergeRequestCardProps, 'status' | 'userCanMerge' | 'canMerge' | 'mergeBlockers' | 'onMerge'>,
+) => {
+  const { status, userCanMerge, canMerge, mergeBlockers, onMerge } = props;
+  const [isMerging, setIsMerging] = useState(false);
+
+  if (status !== 'opened' || !userCanMerge) {
+    return null;
+  }
+
+  if (!canMerge) {
+    const button = (
+      <div>
+        <Button disabled>
+          <AlertCircleIcon className="mr-2 size-4" />
+          Cannot merge
+        </Button>
+      </div>
+    );
+
+    if (mergeBlockers?.length) {
+      return (
+        <TooltipButton button={button}>
+          <ul className="list-disc pl-4">
+            {mergeBlockers.map((blocker, i) => (
+              <li key={i}>{blocker}</li>
+            ))}
+          </ul>
+        </TooltipButton>
+      );
+    }
+
+    return button;
+  }
+
+  const handleMerge = async () => {
+    try {
+      setIsMerging(true);
+      await onMerge?.();
+    } finally {
+      setIsMerging(false);
+    }
+  };
+
+  return (
+    <Button onClick={handleMerge} variant="default">
+      <CheckIcon className="mr-2 size-4" />
+      {isMerging ? 'Merging...' : 'Merge'}
+    </Button>
+  );
+};
+
+const CloseButton = (props: Pick<MergeRequestCardProps, 'status' | 'userCanMerge' | 'onClose'>) => {
+  const { status, userCanMerge, onClose } = props;
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleClose = async () => {
+    try {
+      setIsClosing(true);
+      await onClose?.();
+    } finally {
+      setIsClosing(false);
+    }
+  };
+
+  if (status !== 'closed' && userCanMerge) {
+    return (
+      <Button onClick={handleClose} variant="destructive">
+        <XIcon className="mr-2 size-4" />
+        {isClosing ? 'Closing...' : 'Close'}
+      </Button>
+    );
+  }
+
+  return null;
+};
 
 interface MergeRequestCardProps {
   url: string;
@@ -97,57 +174,6 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
 }) => {
   const realHasConflicts = mergeStatus === 'conflict' || hasConflicts;
 
-  const renderMergeButton = () => {
-    if (status !== 'opened' || !userCanMerge) {
-      return null;
-    }
-
-    if (!canMerge) {
-      const button = (
-        <div>
-          <Button disabled>
-            <AlertCircleIcon className="mr-2 size-4" />
-            Cannot merge
-          </Button>
-        </div>
-      );
-
-      if (mergeBlockers?.length) {
-        return (
-          <TooltipButton button={button}>
-            <ul className="list-disc pl-4">
-              {mergeBlockers.map((blocker, i) => (
-                <li key={i}>{blocker}</li>
-              ))}
-            </ul>
-          </TooltipButton>
-        );
-      }
-
-      return button;
-    }
-
-    return (
-      <Button onClick={onMerge} variant="default">
-        <CheckIcon className="mr-2 size-4" />
-        Merge
-      </Button>
-    );
-  };
-
-  const renderCloseButton = () => {
-    if (status !== 'closed' && userCanMerge) {
-      return (
-        <Button onClick={onClose} variant="destructive">
-          <XIcon className="mr-2 size-4" />
-          Close
-        </Button>
-      );
-    }
-
-    return null;
-  };
-
   const externalButton = (
     <Button variant="ghost" className="ml-auto" asChild>
       <a tabIndex={-1} href={url} target="_blank" rel="noopener noreferrer">
@@ -203,8 +229,8 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
       </CardContent>
       <CardFooter className="gap-2">
         <section className="flex flex-row gap-4">
-          {showMerge && renderMergeButton()}
-          {showMerge && renderCloseButton()}
+          {showMerge && <MergeButton {...{ status, userCanMerge, canMerge, mergeBlockers, onMerge }} />}
+          {showMerge && <CloseButton {...{ status, userCanMerge, onClose }} />}
         </section>
       </CardFooter>
     </Card>
