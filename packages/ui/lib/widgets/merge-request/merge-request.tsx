@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC, ReactNode } from 'react';
 import {
   Card,
   CardContent,
@@ -8,21 +8,21 @@ import {
   AvatarFallback,
   AvatarImage,
   Button,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
+  TooltipButton,
 } from '../../../index';
-import { AlertCircleIcon, CheckIcon, XIcon, RefreshCwIcon } from 'lucide-react';
-import { PipelineStatus } from './ui/PipelineStatus';
-import { Approvals } from './ui/Approvals';
-import { Reviewers } from './ui/Reviewers';
-import { BranchInfo } from './ui/BranchInfo';
-import { MergeRequestStats } from './ui/MergeRequestStats';
-import { MergeRequestLabels } from './ui/MergeRequestLabels';
-import { ReviewAppButton } from './ui/ReviewAppButton';
+import { AlertCircleIcon, CheckIcon, XIcon, RefreshCwIcon, ExternalLinkIcon } from 'lucide-react';
+import { PipelineStatus } from './ui/pipeline-status';
+import { Approvals } from './ui/approvers';
+import { Reviewers } from './ui/reviewers';
+import { BranchInfo } from './ui/branch-info';
+import { MergeRequestStats } from './ui/merge-request-stats';
+import { MergeRequestLabels } from './ui/merge-request-labels';
+import { ReviewAppButton } from './ui/review-app-button';
+import { Description } from './ui/description';
+import { RefreshButton } from './ui/refresh-button';
 
 interface MergeRequestCardProps {
+  url: string;
   title: string;
   description: string;
   author: {
@@ -53,9 +53,10 @@ interface MergeRequestCardProps {
     slug?: string;
     state?: 'available' | 'stopped' | string;
   };
-  onMerge?: () => Promise<unknown>;
-  onClose?: () => Promise<unknown>;
-  onRefresh?: () => Promise<unknown>;
+  onMerge?: () => Promise<void>;
+  onClose?: () => Promise<void>;
+  onRefresh?: () => Promise<void>;
+  onCloseModal?: () => Promise<void>;
   showAvatar?: boolean;
   showMerge?: boolean;
   showDescription?: boolean;
@@ -64,6 +65,7 @@ interface MergeRequestCardProps {
 export const MergeRequestCard: FC<MergeRequestCardProps> = ({
   title,
   description,
+  url,
   author,
   sourceBranch,
   targetBranch,
@@ -82,6 +84,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
   mergeBlockers = [],
   onMerge,
   onClose,
+  onCloseModal,
   onRefresh,
   showAvatar = true,
   showMerge = true,
@@ -104,18 +107,13 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
 
       if (mergeBlockers?.length) {
         return (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>{button}</TooltipTrigger>
-              <TooltipContent>
-                <ul className="list-disc pl-4">
-                  {mergeBlockers.map((blocker, i) => (
-                    <li key={i}>{blocker}</li>
-                  ))}
-                </ul>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <TooltipButton button={button}>
+            <ul className="list-disc pl-4">
+              {mergeBlockers.map((blocker, i) => (
+                <li key={i}>{blocker}</li>
+              ))}
+            </ul>
+          </TooltipButton>
         );
       }
 
@@ -143,8 +141,27 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
     return null;
   };
 
+  const externalButton = (
+    <Button variant="ghost" className="ml-auto" asChild>
+      <a href={url} target="_blank" rel="noopener noreferrer">
+        <ExternalLinkIcon />
+      </a>
+    </Button>
+  );
+
   return (
-    <Card className="w-full max-w-2xl transition-all hover:shadow-lg">
+    <Card className="relative w-full max-w-2xl transition-all hover:shadow-lg">
+      <div className="absolute right-2 top-2 flex items-center gap-2">
+        {reviewApp?.url && reviewApp?.slug && reviewApp?.state && status !== 'merged' && (
+          <ReviewAppButton state={reviewApp?.state} url={reviewApp?.url} slug={reviewApp?.slug} />
+        )}
+        <TooltipButton button={externalButton}>open in new tab</TooltipButton>
+        <RefreshButton onRefresh={onRefresh} />
+        <Button variant="ghost" className="ml-auto" onClick={onCloseModal}>
+          <XIcon />
+        </Button>
+      </div>
+
       <CardHeader className="space-y-4">
         <div className="flex flex-col items-start gap-4">
           <div className="flex items-center gap-2">
@@ -164,7 +181,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
             <MergeRequestLabels status={status} isDraft={isDraft} isInProgress={isInProgress} />
           </div>
         </div>
-        {showDescription && <p className="text-muted-foreground text-sm">{description}</p>}
+        {showDescription && <Description text={description} />}
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex flex-col gap-4">
@@ -177,15 +194,9 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
         </div>
       </CardContent>
       <CardFooter className="gap-2">
-        <section className="flex w-full flex-row gap-4">
+        <section className="flex flex-row gap-4">
           {showMerge && renderMergeButton()}
           {showMerge && renderCloseButton()}
-          {reviewApp?.url && reviewApp?.slug && reviewApp?.state && status !== 'merged' && (
-            <ReviewAppButton state={reviewApp?.state} url={reviewApp?.url} slug={reviewApp?.slug} />
-          )}
-          <Button variant="ghost" className="ml-auto" onClick={onRefresh}>
-            <RefreshCwIcon />
-          </Button>
         </section>
       </CardFooter>
     </Card>

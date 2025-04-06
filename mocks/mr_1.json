@@ -19,12 +19,12 @@
   "downvotes": 0,
   "author": {
     "id": 13,
-    "username": "pavel.egorov",
-    "name": "Pavel Egorov",
+    "username": "pavel.ivanov",
+    "name": "Pavel Ivanov",
     "state": "active",
     "locked": false,
     "avatar_url": "https://gitlab.example.com/uploads/-/system/user/avatar/13/avatar.png",
-    "web_url": "https://gitlab.example.com/pavel.egorov"
+    "web_url": "https://gitlab.example.com/pavel.ivanov"
   },
   "assignees": [],
   "assignee": null,
@@ -103,12 +103,12 @@
     "yaml_errors": null,
     "user": {
       "id": 13,
-      "username": "pavel.egorov",
-      "name": "Pavel Egorov",
+      "username": "pavel.ivanov",
+      "name": "Pavel Ivanov",
       "state": "active",
       "locked": false,
       "avatar_url": "https://gitlab.example.com/uploads/-/system/user/avatar/13/avatar.png",
-      "web_url": "https://gitlab.example.com/pavel.egorov"
+      "web_url": "https://gitlab.example.com/pavel.ivanov"
     },
     "started_at": "2025-03-06T10:36:56.147Z",
     "finished_at": "2025-03-06T10:41:36.022Z",

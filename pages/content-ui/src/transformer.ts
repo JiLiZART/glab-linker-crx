@@ -20,6 +20,7 @@ export function transformMR(data: MergeRequestData, envData?: Environment) {
   }
 
   return {
+    url: data.web_url,
     projectId: data.project_id,
     iid: data.iid,
     title: data.title || '',

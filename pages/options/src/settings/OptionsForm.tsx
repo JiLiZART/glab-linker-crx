@@ -45,9 +45,16 @@ export const OptionsForm = (props: OptionsFormProps) => {
       console.log({ err });
       const cause = (err instanceof Error && err?.cause) as { message: string } | undefined;
 
-      if (cause?.message === NOT_AUTHORIZED_ERROR) {
-        methods.setError('token', { type: 'manual', message: 'Invalid token' }, { shouldFocus: true });
-        return;
+      if (err instanceof Error) {
+        if (cause?.message === NOT_AUTHORIZED_ERROR) {
+          methods.setError('token', { type: 'manual', message: 'Invalid token' }, { shouldFocus: true });
+          return;
+        }
+
+        if (err?.message === 'Failed to fetch') {
+          methods.setError('hostname', { type: 'manual', message: 'Invalid hostname or token' }, { shouldFocus: true });
+          return;
+        }
       }
     } finally {
       setSaved(false);

@@ -1,5 +1,5 @@
 import { TooltipProvider, Tooltip, TooltipTrigger, Button, TooltipContent } from '../../../../index';
-import { ExternalLinkIcon } from 'lucide-react';
+import { MonitorUp } from 'lucide-react';
 
 const STATES = {
   available: 'bg-green-500/10 text-green-500',
@@ -12,12 +12,11 @@ export function ReviewAppButton({ url, slug, state }: { url: string; slug: strin
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             className={`${STATES[state]} ml-auto gap-1.5`}
             onClick={() => window.open(url, '_blank')}>
-            <ExternalLinkIcon className="size-4" />
-            Review App
+            <MonitorUp className="size-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>{slug}</TooltipContent>

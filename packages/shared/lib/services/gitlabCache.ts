@@ -1,5 +1,9 @@
 import type { MergeRequest } from './types';
 
+const SEC_1 = 1000;
+const MIN_1 = 60 * SEC_1;
+const MIN_5 = 5 * MIN_1;
+
 interface CacheEntry<T> {
   data: T;
   timestamp: number;
@@ -9,7 +13,7 @@ export class GitlabCache {
   private cache: Map<string, CacheEntry<unknown>> = new Map();
   private readonly TTL: number;
 
-  constructor(ttl: number = 5 * 60 * 1000) {
+  constructor(ttl: number = MIN_5) {
     this.TTL = ttl;
   }
 

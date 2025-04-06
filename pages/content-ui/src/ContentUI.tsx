@@ -16,8 +16,7 @@ import {
 import { Card, MergeRequestCard } from '@extension/ui';
 
 import { gitlabBrokerService } from '@extension/shared';
-import type { TransformedMR } from './transformer';
-import { transformMR } from './transformer';
+import { transformMR, type TransformedMR } from './transformer';
 
 function iterateLinks(cb: (el: HTMLAnchorElement) => void) {
   document.querySelectorAll('a').forEach(item => {
@@ -65,17 +64,27 @@ export default function ContentUI() {
   const { getReferenceProps, getFloatingProps } = useInteractions([dismiss, clientPoint, role]);
 
   useEffect(() => {
-    if (isPrecacheAll) {
-      iterateLinks(el => {
-        const url = getLinkUrl(el);
+    iterateLinks(async el => {
+      const url = getLinkUrl(el);
 
-        if (!url) {
-          return;
-        }
+      if (!url) {
+        return;
+      }
 
-        gitlabBrokerService.precacheByUrl(url);
-      });
-    }
+      const gitlab = await gitlabBrokerService.getInstanceByUrl(url);
+
+      if (!gitlab) {
+        return;
+      }
+
+      const hostname = gitlab.getApiHostname();
+
+      if (globalThis.location.hostname == hostname) {
+        return;
+      }
+
+      gitlabBrokerService.precacheByUrl(url);
+    });
 
     const handleOpenPopover = async (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -149,6 +158,8 @@ export default function ContentUI() {
   const handleClose = async () => {
     actionsRef.current?.onClose();
   };
+
+  console.log({ floatingStyles, props: getFloatingProps() });
 
   if (isOpen) {
     return (
