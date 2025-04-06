@@ -30,6 +30,7 @@ export const OptionsForm = (props: OptionsFormProps) => {
   });
   const [saved, setSaved] = useState(false);
   const { handleSubmit, formState, control } = methods;
+  const { isSubmitting } = formState;
 
   const onSubmit = async (values: OptionsFormValues) => {
     console.log({ values });
@@ -70,7 +71,7 @@ export const OptionsForm = (props: OptionsFormProps) => {
         <PositionSettings control={control} />
         <AdvancedSettings control={control} />
 
-        <Actions saved={saved} />
+        <Actions submitting={isSubmitting} saved={saved} />
       </form>
     </FormProvider>
   );

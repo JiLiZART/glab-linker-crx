@@ -20,6 +20,7 @@ import { MergeRequestLabels } from './ui/merge-request-labels';
 import { ReviewAppButton } from './ui/review-app-button';
 import { Description } from './ui/description';
 import { RefreshButton } from './ui/refresh-button';
+import { DiscussionsBadge } from './ui/discussions-badge';
 
 interface MergeRequestCardProps {
   url: string;
@@ -46,7 +47,9 @@ interface MergeRequestCardProps {
   };
   reviewers?: Array<{ name: string; avatar: string }>;
   canMerge: boolean;
-  youCanMerge?: boolean;
+  userCanMerge?: boolean;
+  mergeStatus?: string;
+  discussionsResolved?: boolean;
   mergeBlockers?: string[];
   reviewApp?: {
     url?: string;
@@ -79,9 +82,11 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
   approvals,
   reviewers,
   canMerge,
-  youCanMerge,
+  userCanMerge,
   reviewApp = {},
+  mergeStatus,
   mergeBlockers = [],
+  discussionsResolved,
   onMerge,
   onClose,
   onCloseModal,
@@ -90,8 +95,10 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
   showMerge = true,
   showDescription = true,
 }) => {
+  const realHasConflicts = mergeStatus === 'conflict' || hasConflicts;
+
   const renderMergeButton = () => {
-    if (status !== 'opened') {
+    if (status !== 'opened' || !userCanMerge) {
       return null;
     }
 
@@ -129,7 +136,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
   };
 
   const renderCloseButton = () => {
-    if (status !== 'closed' && youCanMerge) {
+    if (status !== 'closed' && userCanMerge) {
       return (
         <Button onClick={onClose} variant="destructive">
           <XIcon className="mr-2 size-4" />
@@ -143,7 +150,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
 
   const externalButton = (
     <Button variant="ghost" className="ml-auto" asChild>
-      <a href={url} target="_blank" rel="noopener noreferrer">
+      <a tabIndex={-1} href={url} target="_blank" rel="noopener noreferrer">
         <ExternalLinkIcon />
       </a>
     </Button>
@@ -179,6 +186,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
           <div className="flex items-center gap-2">
             {pipeline && <PipelineStatus status={pipeline.status} />}
             <MergeRequestLabels status={status} isDraft={isDraft} isInProgress={isInProgress} />
+            <DiscussionsBadge resolved={!!discussionsResolved} />
           </div>
         </div>
         {showDescription && <Description text={description} />}
@@ -186,7 +194,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
       <CardContent className="space-y-4">
         <div className="flex flex-col gap-4">
           <BranchInfo sourceBranch={sourceBranch} targetBranch={targetBranch} />
-          <MergeRequestStats changesCount={changesCount} hasConflicts={hasConflicts} createdAt={updatedAt} />
+          <MergeRequestStats changesCount={changesCount} hasConflicts={realHasConflicts} createdAt={updatedAt} />
         </div>
         <div className="flex flex-row gap-4">
           {approvals && <Approvals approvers={approvals?.approvers} requiredApprovals={approvals?.required} />}

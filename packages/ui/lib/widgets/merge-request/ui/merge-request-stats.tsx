@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { GitCommitIcon, AlertTriangleIcon } from 'lucide-react';
-import { Badge, Separator, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../../index';
+import { Badge, Separator, TooltipButton } from '../../../../index';
 
 interface MergeRequestStatsProps {
   changesCount: number;
@@ -20,19 +20,15 @@ export const MergeRequestStats: FC<MergeRequestStatsProps> = ({ changesCount, ha
       {hasConflicts && (
         <>
           <Separator orientation="vertical" className="h-4" />
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-500">
-                  <AlertTriangleIcon className="mr-1 size-3" />
-                  Conflicts
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>This merge request has conflicts that must be resolved</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <TooltipButton
+            button={
+              <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-500">
+                <AlertTriangleIcon className="mr-1 size-3" />
+                Conflicts
+              </Badge>
+            }>
+            <p>This merge request has conflicts that must be resolved</p>
+          </TooltipButton>
         </>
       )}
     </div>

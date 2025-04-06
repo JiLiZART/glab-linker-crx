@@ -5,10 +5,6 @@ import { GitLabService } from './gitlabService';
 class GitlabBrokerService {
   private instanceCache: Map<string, GitLabService> = new Map();
 
-  async precacheByUrl(url: string) {}
-
-  async fetchMRByUrl(url: string) {}
-
   // Get instance by host url
   async getInstanceByUrl(url: string): Promise<GitLabService | null> {
     const host = this.extractHostname(url);
@@ -57,6 +53,7 @@ class GitlabBrokerService {
       name: config.name,
       apiUrl: config?.form?.hostname || '',
       token: config?.form?.token || '',
+      config: config?.form,
     });
 
     this.cacheInstance(instance);

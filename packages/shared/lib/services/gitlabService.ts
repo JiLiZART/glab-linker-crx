@@ -1,6 +1,7 @@
 import { GitlabApi } from './gitlabApi';
 import { GitlabCache } from './gitlabCache';
 import type { Environment, MergeRequest } from './types';
+import type { GitlabConfigItem } from '@extension/storage';
 
 function extractMRFromUrl(mrUrl: string, hostname: string) {
   // Extract project path and MR ID from the URL
@@ -27,22 +28,25 @@ type GitlabInstanceConfig = {
   name: string;
   apiUrl: string;
   token: string;
+  config: GitlabConfigItem['form'];
 };
 
 export class GitLabService {
   private __api?: GitlabApi;
   private __cache?: GitlabCache;
+  private __config?: GitlabConfigItem['form'];
 
   public apiUrl: string;
   private __token: string;
   public id: string;
   public name: string;
 
-  constructor(config: GitlabInstanceConfig) {
-    this.apiUrl = config.apiUrl;
-    this.__token = config.token;
-    this.id = config.id;
-    this.name = config.name;
+  constructor(item: GitlabInstanceConfig) {
+    this.apiUrl = item.apiUrl;
+    this.__token = item.token;
+    this.id = item.id;
+    this.name = item.name;
+    this.__config = item.config;
   }
 
   get api() {
@@ -59,6 +63,10 @@ export class GitLabService {
     }
 
     return this.__cache;
+  }
+
+  get config() {
+    return this.__config;
   }
 
   getApiHostname() {

@@ -17,6 +17,7 @@ import { Card, MergeRequestCard } from '@extension/ui';
 
 import { gitlabBrokerService } from '@extension/shared';
 import { transformMR, type TransformedMR } from './transformer';
+import { Loader } from 'lucide-react';
 
 function iterateLinks(cb: (el: HTMLAnchorElement) => void) {
   document.querySelectorAll('a').forEach(item => {
@@ -63,6 +64,58 @@ export default function ContentUI() {
   // Merge all the interactions into prop getters
   const { getReferenceProps, getFloatingProps } = useInteractions([dismiss, clientPoint, role]);
 
+  const prepareMR = async (url: string | null) => {
+    if (!url) {
+      return;
+    }
+
+    const gitlab = await gitlabBrokerService.getInstanceByUrl(url);
+
+    if (!gitlab) {
+      return;
+    }
+
+    const hostname = gitlab.getApiHostname();
+
+    if (globalThis.location.hostname == hostname) {
+      return;
+    }
+
+    const mrJson = await gitlab.getMRByUrl(url).catch(err => {
+      console.log('gitlab.getMRByUrl', err);
+    });
+
+    if (!mrJson) {
+      console.error('glab-linker-crx: failed to fetch MR info');
+      return;
+    }
+
+    const reviewApp = await gitlab.getMRReviewApp(mrJson?.pipeline?.project_id, mrJson?.pipeline?.ref);
+
+    const mr = transformMR(mrJson, reviewApp);
+
+    if (mr) {
+      actionsRef.current = {
+        async onMerge() {
+          const mrData = await gitlab.mergeMR(mr.projectId, mr.iid);
+          const newMr = transformMR(mrData, reviewApp);
+
+          setMr(newMr);
+        },
+        async onClose() {
+          const mrData = await gitlab.closeMR(mr.projectId, mr.iid);
+          const newMr = transformMR(mrData, reviewApp);
+
+          setMr(newMr);
+        },
+      };
+    }
+
+    setMr(mr);
+
+    return true;
+  };
+
   useEffect(() => {
     iterateLinks(async el => {
       const url = getLinkUrl(el);
@@ -83,7 +136,7 @@ export default function ContentUI() {
         return;
       }
 
-      gitlabBrokerService.precacheByUrl(url);
+      // gitlabBrokerService.precacheByUrl(url);
     });
 
     const handleOpenPopover = async (e: MouseEvent) => {
@@ -96,55 +149,9 @@ export default function ContentUI() {
 
       const url = getLinkUrl(el);
 
-      if (!url) {
-        return;
-      }
-
-      const gitlab = await gitlabBrokerService.getInstanceByUrl(url);
-
-      if (!gitlab) {
-        return;
-      }
-
-      const hostname = gitlab.getApiHostname();
-
-      if (globalThis.location.hostname == hostname) {
-        return;
-      }
-
       setOpen(true);
 
-      const mrData = await gitlab.getMRByUrl(url).catch(err => {
-        console.log('gitlab.getMRByUrl', err);
-      });
-
-      if (!mrData) {
-        console.error('glab-linker-crx: failed to fetch MR info');
-        return;
-      }
-
-      const reviewApp = await gitlab.getMRReviewApp(mrData?.pipeline?.project_id, mrData?.pipeline?.ref);
-
-      const mr = transformMR(mrData, reviewApp);
-
-      if (mr) {
-        actionsRef.current = {
-          async onMerge() {
-            const mrData = await gitlab.mergeMR(mr.projectId, mr.iid);
-            const newMr = transformMR(mrData, reviewApp);
-
-            setMr(newMr);
-          },
-          async onClose() {
-            const mrData = await gitlab.closeMR(mr.projectId, mr.iid);
-            const newMr = transformMR(mrData, reviewApp);
-
-            setMr(newMr);
-          },
-        };
-      }
-
-      setMr(mr);
+      await prepareMR(url);
     };
 
     document.addEventListener('mouseover', handleOpenPopover);
@@ -159,6 +166,16 @@ export default function ContentUI() {
     actionsRef.current?.onClose();
   };
 
+  const handleClosePopup = async () => {
+    setOpen(false);
+  };
+
+  const handleRefresh = async () => {
+    if (mr) {
+      await prepareMR(mr?.url);
+    }
+  };
+
   console.log({ floatingStyles, props: getFloatingProps() });
 
   if (isOpen) {
@@ -168,8 +185,19 @@ export default function ContentUI() {
           ref={refs.setFloating}
           style={{ ...floatingStyles, zIndex: 9999, outline: 'none' }}
           {...getFloatingProps()}>
-          {mr && <MergeRequestCard {...mr} onMerge={handleMerge} onClose={handleClose} />}
-          {!mr && <Card className="w-full max-w-2xl transition-all hover:shadow-lg">Loading...</Card>}
+          {mr ? (
+            <MergeRequestCard
+              {...mr}
+              onRefresh={handleRefresh}
+              onMerge={handleMerge}
+              onClose={handleClose}
+              onCloseModal={handleClosePopup}
+            />
+          ) : (
+            <Card className="w-full max-w-2xl transition-all hover:shadow-lg">
+              <Loader className="size-4" />
+            </Card>
+          )}
         </div>
       </FloatingFocusManager>
     );

@@ -42,8 +42,10 @@ export function transformMR(data: MergeRequestData, envData?: Environment) {
     isDraft: data.draft,
     isInProgress: data.work_in_progress,
     hasConflicts: data.has_conflicts,
+    mergeStatus: data.detailed_merge_status || data.merge_status,
     canMerge: data.merge_status === 'can_be_merged',
-    youCanMerge: data.user.can_merge,
+    userCanMerge: data.user.can_merge,
+    discussionsResolved: data.blocking_discussions_resolved,
     reviewApp: envData ? reviewApp : undefined,
     // approvals: {
     //   approvers: [
