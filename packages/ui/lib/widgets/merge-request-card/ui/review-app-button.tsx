@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import type { ReviewAppModel } from '../../../adapters/mr-adapter';
 import { ExternalLink } from 'lucide-react';
 import { Button } from '@/index';
+import type { ReviewAppModel } from '@extension/shared';
 
-export function ReviewAppButton(props: { reviewApp: Promise<ReviewAppModel | undefined> | undefined }) {
+export function ReviewAppButton(props: { reviewApp?: () => Promise<ReviewAppModel | undefined> | undefined }) {
   const { reviewApp } = props;
   const [data, setData] = useState<ReviewAppModel | undefined>();
 
   useEffect(() => {
-    reviewApp?.then(setData);
+    reviewApp?.()?.then(setData);
   }, [reviewApp]);
 
   if (!data) {

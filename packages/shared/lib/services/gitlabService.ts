@@ -3,7 +3,19 @@ import { GitlabCache } from './gitlabCache';
 import type { EnvironmentResponse, MergeRequestResponse } from './types';
 import type { GitlabConfigItem } from '@extension/storage';
 
-function extractMRFromUrl(mrUrl: string, hostname: string) {
+export function getMRUrl(url?: string) {
+  if (!url) {
+    return null;
+  }
+
+  if (!url.includes('/merge_requests/')) {
+    return null;
+  }
+
+  return url;
+}
+
+export function extractMRFromUrl(mrUrl: string, hostname: string) {
   // Extract project path and MR ID from the URL
   // const urlPattern = /https:\/\/gitlab\.com\/(.+?)\/-\/merge_requests\/(\d+)/;
   const urlPattern = new RegExp(`https://${hostname}/(.+?)/-/merge_requests/(\\d+)`);

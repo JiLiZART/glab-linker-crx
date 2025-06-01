@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, Badge, Button, Skeleton } from '@/index';
 import { ExternalLink, CheckCircle2, XCircle, Play, Clock, Pause } from 'lucide-react';
-import type { PipelineModel } from '../../../adapters/mr-adapter';
+import type { PipelineModel } from '@extension/shared';
 
 interface PipelineListProps {
-  pipelines?: Promise<PipelineModel | undefined> | undefined;
+  pipelines?: () => Promise<PipelineModel | undefined> | undefined;
 }
 
 const getStatusIcon = (status: string) => {
@@ -48,9 +48,11 @@ export function PipelineList({ pipelines }: PipelineListProps) {
   const [data, setData] = useState<PipelineModel | undefined>();
 
   useEffect(() => {
-    pipelines?.then(setData).finally(() => {
-      setLoading(false);
-    });
+    pipelines?.()
+      ?.then(setData)
+      .finally(() => {
+        setLoading(false);
+      });
   }, [pipelines]);
 
   if (loading || !data) {

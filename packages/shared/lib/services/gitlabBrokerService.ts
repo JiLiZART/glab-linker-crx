@@ -30,6 +30,8 @@ async function fetchFullMR(url: string | null) {
 
   const mrRes = await gitlab.fetchMR(url).catch(err => {
     console.log('gitlab.fetchMR', err);
+    debugger;
+    return null;
   });
 
   if (!mrRes) {
@@ -42,25 +44,53 @@ async function fetchFullMR(url: string | null) {
 
   return {
     data: data,
-    get reivewApp() {
-      return gitlab.fetchReviewApp(mrRes?.pipeline?.project_id, mrRes?.pipeline?.ref).then(envRes => {
-        return envRes ? adaptGitlabReviewApp(envRes) : undefined;
-      });
+    reivewApp() {
+      return gitlab
+        .fetchReviewApp(mrRes?.pipeline?.project_id, mrRes?.pipeline?.ref)
+        .then(envRes => {
+          return envRes ? adaptGitlabReviewApp(envRes) : undefined;
+        })
+        .catch(err => {
+          console.log('gitlab.fetchReviewApp', err);
+          debugger;
+          return undefined;
+        });
     },
-    get commits() {
-      return gitlab.fetchCommits(mrRes?.project_id, mrRes?.iid).then(commitsRes => {
-        return commitsRes ? adaptGitlabCommits(commitsRes) : undefined;
-      });
+    commits() {
+      return gitlab
+        .fetchCommits(mrRes?.project_id, mrRes?.iid)
+        .then(commitsRes => {
+          return commitsRes ? adaptGitlabCommits(commitsRes) : undefined;
+        })
+        .catch(err => {
+          console.log('gitlab.fetchCommits', err);
+          debugger;
+          return undefined;
+        });
     },
-    get pipelines() {
-      return gitlab.fetchPipelines(mrRes?.project_id, mrRes?.iid).then(pipelinesRes => {
-        return pipelinesRes ? adaptGitlabPipelines(pipelinesRes) : undefined;
-      });
+    pipelines() {
+      return gitlab
+        .fetchPipelines(mrRes?.project_id, mrRes?.iid)
+        .then(pipelinesRes => {
+          return pipelinesRes ? adaptGitlabPipelines(pipelinesRes) : undefined;
+        })
+        .catch(err => {
+          console.log('gitlab.fetchPipelines', err);
+          debugger;
+          return undefined;
+        });
     },
-    get diff() {
-      return gitlab.fetchDiff(mrRes?.project_id, mrRes?.iid).then(diffRes => {
-        return diffRes ? adaptGitlabDiff(diffRes) : undefined;
-      });
+    diff() {
+      return gitlab
+        .fetchDiff(mrRes?.project_id, mrRes?.iid)
+        .then(diffRes => {
+          return diffRes ? adaptGitlabDiff(diffRes) : undefined;
+        })
+        .catch(err => {
+          console.log('gitlab.fetchDiff', err);
+          debugger;
+          return undefined;
+        });
     },
   };
 }

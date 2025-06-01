@@ -72,7 +72,7 @@ export class GitlabApi {
   }
 
   async getMRDiff(projectId: string | number, mrIid: string | number) {
-    return this.api<DiffResponse[]>(`projects/${encodeURIComponent(projectId)}/merge_requests/${mrIid}/diff`, 'GET');
+    return this.api<DiffResponse[]>(`projects/${encodeURIComponent(projectId)}/merge_requests/${mrIid}/diffs`, 'GET');
   }
 
   async getMREnvironments(projectId: string | number, ref: string) {

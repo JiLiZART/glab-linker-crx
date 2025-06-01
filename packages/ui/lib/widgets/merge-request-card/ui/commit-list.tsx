@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, Skeleton } from '@/index';
+import { Avatar, AvatarFallback, AvatarImage, Card, CardContent, Skeleton } from '@/index';
 import { GitCommit } from 'lucide-react';
-import type { CommitModel } from '../../../adapters/mr-adapter';
+import type { CommitModel } from '@extension/shared';
 
 interface CommitListProps {
-  commits?: Promise<CommitModel | undefined> | undefined;
+  commits?: () => Promise<CommitModel | undefined>;
 }
 
 export function CommitList({ commits }: CommitListProps) {
@@ -14,9 +14,11 @@ export function CommitList({ commits }: CommitListProps) {
   const [data, setData] = useState<CommitModel | undefined>();
 
   useEffect(() => {
-    commits?.then(setData).finally(() => {
-      setLoading(false);
-    });
+    commits?.()
+      ?.then(setData)
+      .finally(() => {
+        setLoading(false);
+      });
   }, [commits]);
 
   if (loading || !data) {
@@ -57,34 +59,35 @@ export function CommitList({ commits }: CommitListProps) {
 
       <div className="space-y-2">
         {data?.map(commit => (
-          <Card key={commit.id} className="overflow-hidden">
-            <CardContent className="p-4">
-              <div className="flex items-start">
-                <div className="mr-3 mt-1">
-                  <GitCommit className="size-5 text-gray-500" />
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between">
-                    <h4 className="truncate text-sm font-medium">{commit.message}</h4>
-                    <span className="ml-2 whitespace-nowrap text-xs text-gray-500">
-                      {new Date(commit.date).toLocaleString()}
-                    </span>
+          <a key={commit.id} href={commit.url} target="_blank" className="w-full" rel="noopener noreferrer">
+            <Card className="overflow-hidden">
+              <CardContent className="p-4">
+                <div className="flex items-start">
+                  <div className="mr-3 mt-1">
+                    <GitCommit className="size-5 text-gray-500" />
                   </div>
 
-                  <div className="mt-1 flex items-center">
-                    <img
-                      src={commit.author.avatarUrl || '/placeholder.svg'}
-                      alt={commit.author.name}
-                      className="mr-1 size-4 rounded-full"
-                    />
-                    <span className="text-xs text-gray-600">{commit.author.name}</span>
-                    <span className="ml-2 font-mono text-xs text-gray-400">{commit.sha.substring(0, 8)}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between">
+                      <h4 className="truncate text-sm font-medium">{commit.message}</h4>
+                      <span className="ml-2 whitespace-nowrap text-xs text-gray-500">
+                        {new Date(commit.date).toLocaleString()}
+                      </span>
+                    </div>
+
+                    <div className="mt-1 flex items-center">
+                      <Avatar className="border-background mr-1 size-4 rounded-full border-2">
+                        <AvatarImage src={commit.author.avatarUrl} alt={commit.author.name} />
+                        <AvatarFallback>{commit.author.name[0]}</AvatarFallback>
+                      </Avatar>
+                      <span className="text-xs text-gray-600">{commit.author.name}</span>
+                      <span className="ml-2 font-mono text-xs text-gray-400">{commit.sha.substring(0, 8)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </a>
         ))}
       </div>
     </div>

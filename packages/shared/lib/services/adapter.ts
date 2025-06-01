@@ -24,9 +24,10 @@ export function adaptGitlabCommits(gitlabCommits: CommitResponse[]) {
     author: {
       id: commit.author_name,
       name: commit.author_name,
-      avatarUrl: `/placeholder.svg?height=40&width=40`, // GitLab API doesn't provide avatar in commit data
+      avatarUrl: undefined, // GitLab API doesn't provide avatar in commit data
     },
     date: commit.created_at,
+    url: commit.web_url,
   }));
 }
 

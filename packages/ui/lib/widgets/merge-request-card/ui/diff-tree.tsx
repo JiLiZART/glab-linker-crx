@@ -8,7 +8,7 @@ import { DiffViewer } from './diff-viewer';
 import type { ChangeModel } from '@extension/shared';
 
 interface DiffTreeProps {
-  changes?: Promise<ChangeModel | undefined> | undefined;
+  changes?: () => Promise<ChangeModel | undefined>;
 }
 
 // Function to optimize file structure by collapsing single-item folders
@@ -56,7 +56,7 @@ export function DiffTree({ changes }: DiffTreeProps) {
   const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [processedFiles, setProcessedFiles] = useState<FileChange[]>([]);
-  const [data, setData] = useState<ChangeModel | undefined>();
+  const [data, setData] = useState<ChangeModel | undefined | null>();
   const [stats, setStats] = useState({
     additions: 0,
     deletions: 0,
@@ -91,7 +91,7 @@ export function DiffTree({ changes }: DiffTreeProps) {
   const diff = data?.files ? data.files.find(file => file.path === selectedFile)?.diff : null;
 
   useEffect(() => {
-    changes
+    changes?.()
       ?.then(res => {
         if (!res) {
           return;
@@ -123,6 +123,14 @@ export function DiffTree({ changes }: DiffTreeProps) {
         const optimizedFiles = optimizeFileStructure(res.files);
         setProcessedFiles(optimizedFiles);
       })
+      .catch(err => {
+        console.log('diffTree.fetch', err);
+        debugger;
+
+        setData(null);
+
+        return null;
+      })
       .finally(() => {
         setLoading(false);
       });
@@ -138,6 +146,10 @@ export function DiffTree({ changes }: DiffTreeProps) {
 
     return () => clearTimeout(timer);
   }, [changes]);
+
+  if (data === null) {
+    return null;
+  }
 
   if (loading || !data) {
     return (

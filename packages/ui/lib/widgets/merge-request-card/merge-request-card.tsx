@@ -2,27 +2,38 @@
 
 import { useState } from 'react';
 import { RefreshCcw, Maximize2, GitMerge, XCircle, X, CheckCircle } from 'lucide-react';
-import { Button, Card, CardContent, CardFooter, CardHeader, Badge, TooltipWrapper } from '@/index';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  Badge,
+  TooltipWrapper,
+} from '@/index';
 import { SkeletonCard } from './ui/skeleton-card';
 import { MergeRequestStatus } from './ui/merge-request-status';
 import { PipelineStatus } from './ui/pipeline-status';
 import { MarkdownRenderer } from './ui/markdown-renderer';
 import { AvatarStack } from './ui/avatar-stack';
-import type { MergeRequestModel, ReviewAppModel } from '@extension/shared';
 import { ReviewAppButton } from './ui/review-app-button';
-
-// import type { MergeRequest } from "../types"
+import { BranchInfo } from './ui/branch-info';
+import type { MergeRequestModel, ReviewAppModel } from '@extension/shared';
 
 interface MergeRequestCardProps {
   mr?: MergeRequestModel;
-  reviewApp: Promise<ReviewAppModel | undefined> | undefined;
+  reviewApp?: () => Promise<ReviewAppModel | undefined>;
   isLoading?: boolean;
-  children: (onClose: () => void) => React.ReactNode;
+  onFullscreen?: () => void;
   onRefreshMR?: (url: string) => Promise<void>;
   onApproveMR?: (url: string) => Promise<void>;
   onMergeMR?: (url: string) => Promise<void>;
   onCloseMR?: (url: string) => Promise<void>;
   onClose?: () => void;
+  showAvatar?: boolean;
 }
 
 function CloseButton(props: Pick<MergeRequestCardProps, 'mr' | 'onClose'>) {
@@ -55,17 +66,27 @@ function AuthorAvatar(props: Pick<MergeRequestCardProps, 'mr'>) {
   }
 
   return (
-    <div className="flex items-center">
-      <img src={mr.author.avatarUrl || '/placeholder.svg'} alt={mr.author.name} className="mr-2 size-6 rounded-full" />
-      <span className="text-sm font-medium">{mr.author.name}</span>
-    </div>
+    <Avatar className="border-background size-10 border-2">
+      <AvatarImage src={mr.author.avatarUrl} alt={mr.author.name} />
+      <AvatarFallback>{mr.author.name[0]}</AvatarFallback>
+    </Avatar>
   );
 }
 
 export function MergeRequestCard(props: MergeRequestCardProps) {
-  const { mr, reviewApp, isLoading, children, onClose, onRefreshMR, onApproveMR, onMergeMR, onCloseMR } = props;
+  const {
+    showAvatar = true,
+    mr,
+    reviewApp,
+    isLoading,
+    onClose,
+    onFullscreen,
+    onRefreshMR,
+    onApproveMR,
+    onMergeMR,
+    onCloseMR,
+  } = props;
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [cardPosition, setCardPosition] = useState({ top: 0, left: 0, width: 0, height: 0 });
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -92,18 +113,18 @@ export function MergeRequestCard(props: MergeRequestCardProps) {
       // Start animation and then show fullscreen
       setIsAnimating(true);
       setTimeout(() => {
-        setIsFullscreen(true);
+        onFullscreen?.();
         setIsAnimating(false);
       }, 300); // Match this with the CSS transition duration
     } else {
       // Fallback if element not found
-      setIsFullscreen(true);
+      onFullscreen?.();
     }
   };
 
   console.log({ mr, isAnimating, isLoading });
 
-  if (isRefreshing || isLoading || !mr) {
+  if (isLoading || !mr) {
     return <SkeletonCard />;
   }
 
@@ -123,57 +144,56 @@ export function MergeRequestCard(props: MergeRequestCardProps) {
     </TooltipWrapper>
   );
 
-  const onFullscreenClose = () => setIsFullscreen(false);
-
   return (
     <>
       <Card id="mr-card" className="relative w-full max-w-2xl shadow-md transition-all duration-300 hover:shadow-lg">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div className="flex items-center space-x-2">
-            <h2 className="text-xl font-semibold">{mr.title}</h2>
-            <Badge variant="outline" className="ml-2">
-              !{mr.id}
-            </Badge>
-          </div>
-          <div className="flex items-center space-x-1">
-            {refreshButton}
-            {fullScreenButton}
-            <CloseButton onClose={onClose} />
+        <div className="absolute right-2 top-2 flex items-center gap-2">
+          <ReviewAppButton reviewApp={reviewApp} />
+          {refreshButton}
+          {fullScreenButton}
+          <CloseButton onClose={onClose} />
+        </div>
+
+        <CardHeader className="space-y-4">
+          <div className="flex flex-col items-start gap-4">
+            <div className="flex flex-col items-start">
+              <div className="flex items-center gap-2">
+                {showAvatar && <AuthorAvatar mr={mr} />}
+                <h2 className="font-semibold leading-none">{mr.title}</h2>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="text-muted-foreground text-sm">by {mr.author.name}</div>
+                <Badge variant="outline" className="ml-2">
+                  !{mr.id}
+                </Badge>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <MergeRequestStatus status={mr.status} mergeBlockers={mr.mergeBlockers} />
+              <PipelineStatus status={mr.pipelineStatus} />
+            </div>
           </div>
         </CardHeader>
 
         <CardContent className="pt-0">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <MergeRequestStatus status={mr.status} mergeBlockers={mr.mergeBlockers} />
-              <PipelineStatus status={mr.pipelineStatus} />
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <ReviewAppButton reviewApp={reviewApp} />
-            </div>
-          </div>
-
           <div className="mb-4 max-h-32 overflow-y-auto rounded-md border bg-gray-50 p-3">
             <MarkdownRenderer content={mr.description} />
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-4">
-            <div>
-              <p className="mb-1 text-sm text-gray-500">Author</p>
-              <AuthorAvatar mr={mr} />
-            </div>
+          <div className="flex flex-col gap-4">
+            <BranchInfo sourceBranch={mr.sourceBranch} targetBranch={mr.targetBranch} />
+            {/*<MergeRequestStats changesCount={mr.ca} hasConflicts={} createdAt={updatedAt} />*/}
+          </div>
 
-            <div>
-              <p className="mb-1 text-sm text-gray-500">Reviewers ({mr.reviewers.length})</p>
+          <div className="flex flex-row gap-4">
+            <div className="mb-1 text-sm text-gray-500">
               <AvatarStack users={mr.reviewers} maxVisible={3} />
+              Reviewers ({mr.reviewers.length})
             </div>
-
-            <div>
-              <p className="mb-1 text-sm text-gray-500">
-                Approvals ({mr.approvers.length}/{mr.requiredApprovals})
-              </p>
+            <div className="mb-1 text-sm text-gray-500">
               <AvatarStack users={mr.approvers} maxVisible={3} showTooltipNames={true} />
+              Approvals ({mr.approvers.length}/{mr.requiredApprovals})
             </div>
           </div>
         </CardContent>
@@ -217,7 +237,7 @@ export function MergeRequestCard(props: MergeRequestCardProps) {
           className="fixed inset-0 z-50 bg-black bg-opacity-50 transition-opacity duration-300"
           style={{ opacity: isAnimating ? 1 : 0 }}>
           <div
-            className="absolute rounded-md bg-white shadow-xl transition-all duration-300 ease-in-out"
+            className="absolute w-full max-w-2xl rounded-md bg-white shadow-xl transition-all duration-300 ease-in-out"
             style={{
               top: cardPosition.top,
               left: cardPosition.left,
@@ -230,8 +250,6 @@ export function MergeRequestCard(props: MergeRequestCardProps) {
           />
         </div>
       )}
-
-      {isFullscreen && children(onFullscreenClose)}
     </>
   );
 }
