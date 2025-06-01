@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import ContentUI from '@src/ContentUI';
+import ContentUI from '@src/content-ui';
 import tailwindcssOutput from '../dist/tailwind-output.css?inline';
 
 const root = document.createElement('div');

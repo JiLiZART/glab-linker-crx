@@ -1,4 +1,5 @@
-import { useState, type FC, type ReactNode } from 'react';
+/* eslint-disable tailwindcss/no-custom-classname */
+import { useState, type FC } from 'react';
 import {
   Card,
   CardContent,
@@ -10,7 +11,7 @@ import {
   Button,
   TooltipButton,
 } from '../../../index';
-import { AlertCircleIcon, CheckIcon, XIcon, RefreshCwIcon, ExternalLinkIcon, Merge } from 'lucide-react';
+import { AlertCircleIcon, CheckIcon, XIcon, ExternalLinkIcon } from 'lucide-react';
 import { PipelineStatus } from './ui/pipeline-status';
 import { Approvals } from './ui/approvers';
 import { Reviewers } from './ui/reviewers';
@@ -136,13 +137,13 @@ interface MergeRequestCardProps {
   onMerge?: () => Promise<void>;
   onClose?: () => Promise<void>;
   onRefresh?: () => Promise<void>;
-  onCloseModal?: () => Promise<void>;
+  onClosePopup?: () => Promise<void>;
   showAvatar?: boolean;
   showMerge?: boolean;
   showDescription?: boolean;
 }
 
-export const MergeRequestCard: FC<MergeRequestCardProps> = ({
+export const MergeRequest: FC<MergeRequestCardProps> = ({
   title,
   description,
   url,
@@ -166,7 +167,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
   discussionsResolved,
   onMerge,
   onClose,
-  onCloseModal,
+  onClosePopup,
   onRefresh,
   showAvatar = true,
   showMerge = true,
@@ -190,7 +191,7 @@ export const MergeRequestCard: FC<MergeRequestCardProps> = ({
         )}
         <TooltipButton button={externalButton}>open in new tab</TooltipButton>
         <RefreshButton onRefresh={onRefresh} />
-        <Button variant="ghost" className="ml-auto" onClick={onCloseModal}>
+        <Button variant="ghost" className="ml-auto" onClick={onClosePopup}>
           <XIcon />
         </Button>
       </div>

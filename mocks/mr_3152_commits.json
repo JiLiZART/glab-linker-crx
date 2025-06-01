@@ -1,0 +1,19 @@
+[
+  {
+    "id": "376161d4841218f6357c2e384c6135f51cce024e",
+    "short_id": "376161d4",
+    "created_at": "2025-05-04T19:58:43.000+00:00",
+    "parent_ids": ["a3fcdb241411d808a962d3752ebe1260e9d1d5c4"],
+    "title": "feat(frontend): refacto aliasPreferredRegion implementation",
+    "message": "feat(frontend): refacto aliasPreferredRegion implementation\n",
+    "author_name": "gugueU",
+    "author_email": "gugue_u@hotmail.com",
+    "authored_date": "2025-03-30T23:41:08.000+02:00",
+    "committer_name": "Bkg2k",
+    "committer_email": "bkg2k9@gmail.com",
+    "committed_date": "2025-05-04T19:58:43.000+00:00",
+    "trailers": {},
+    "extended_trailers": {},
+    "web_url": "https://gitlab.com/recalbox/recalbox/-/commit/376161d4841218f6357c2e384c6135f51cce024e"
+  }
+]

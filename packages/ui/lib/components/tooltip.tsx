@@ -36,4 +36,15 @@ const TooltipButton = ({ children, button }: { children: React.ReactNode; button
   );
 };
 
-export { TooltipButton, Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };
+const TooltipWrapper = ({ children, text }: { children: React.ReactNode; text: React.ReactNode }) => {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
+        <TooltipContent>{text}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
+export { TooltipButton, Tooltip, TooltipWrapper, TooltipTrigger, TooltipContent, TooltipProvider };

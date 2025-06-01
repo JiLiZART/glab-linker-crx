@@ -207,6 +207,13 @@ importers:
         version: link:../tsconfig
 
   packages/shared:
+    dependencies:
+      lucide-react:
+        specifier: 0.487.0
+        version: 0.487.0(react@19.1.0)
+      react-markdown:
+        specifier: 10.1.0
+        version: 10.1.0(@types/react@19.1.0)(react@19.1.0)
     devDependencies:
       '@extension/storage':
         specifier: workspace:*
@@ -378,6 +385,9 @@ importers:
         specifier: ^3.23.8
         version: 3.23.8
     devDependencies:
+      '@extension/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@extension/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -445,9 +455,6 @@ importers:
       '@extension/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      '@extension/storage':
-        specifier: workspace:*
-        version: link:../../packages/storage
       '@extension/ui':
         specifier: workspace:*
         version: link:../../packages/ui

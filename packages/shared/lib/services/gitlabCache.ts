@@ -1,4 +1,4 @@
-import type { MergeRequest } from './types';
+import type { MergeRequestResponse } from './types';
 
 const SEC_1 = 1000;
 const MIN_1 = 60 * SEC_1;
@@ -39,7 +39,7 @@ export class GitlabCache {
     });
   }
 
-  updateMR(mr: MergeRequest): void {
+  updateMR(mr: MergeRequestResponse): void {
     this.set(mr.project_id, mr, mr.iid);
   }
 

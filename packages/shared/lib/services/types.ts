@@ -1,4 +1,4 @@
-export interface MergeRequest {
+export interface MergeRequestResponse {
   id: number;
   iid: number;
   project_id: number;
@@ -55,7 +55,7 @@ export interface MergeRequest {
   latest_build_started_at: string;
   latest_build_finished_at: string;
   first_deployed_to_production_at: string;
-  pipeline: Pipeline;
+  pipeline: PipelineResponse;
   head_pipeline: HeadPipeline;
   diff_refs: DiffRefs;
   merge_error: string;
@@ -91,19 +91,6 @@ export interface TaskCompletionStatus {
   completed_count: number;
 }
 
-export interface Pipeline {
-  id: number;
-  iid: number;
-  project_id: number;
-  sha: string;
-  ref: string;
-  status: string;
-  source: string;
-  created_at: string;
-  updated_at: string;
-  web_url: string;
-}
-
 export interface HeadPipeline {
   id: number;
   iid: number;
@@ -118,7 +105,15 @@ export interface HeadPipeline {
   before_sha: string;
   tag: boolean;
   yaml_errors: string;
-  user: User;
+  user: {
+    id: number;
+    username: string;
+    name: string;
+    state: string;
+    locked: boolean;
+    avatar_url: string;
+    web_url: string;
+  };
   started_at: string;
   finished_at: string;
   committed_at: string;
@@ -126,16 +121,6 @@ export interface HeadPipeline {
   queued_duration: number;
   coverage: string;
   detailed_status: DetailedStatus;
-}
-
-export interface User {
-  id: number;
-  username: string;
-  name: string;
-  state: string;
-  locked: boolean;
-  avatar_url: string;
-  web_url: string;
 }
 
 export interface DetailedStatus {
@@ -160,7 +145,7 @@ export interface User2 {
   can_merge: boolean;
 }
 
-export interface Environment {
+export interface EnvironmentResponse {
   id: number;
   name: string;
   slug: string;
@@ -171,4 +156,51 @@ export interface Environment {
   state: string | 'stopped';
   auto_stop_at: string | null;
   description: string | null;
+}
+
+export interface CommitResponse {
+  id: string;
+  short_id: string;
+  created_at: string;
+  parent_ids: string[];
+  title: string;
+  message: string;
+  author_name: string;
+  author_email: string;
+  authored_date: string;
+  committer_name: string;
+  committer_email: string;
+  committed_date: string;
+  trailers: Trailers;
+  extended_trailers: ExtendedTrailers;
+  web_url: string;
+}
+
+export interface Trailers {}
+
+export interface ExtendedTrailers {}
+
+export interface PipelineResponse {
+  id: number;
+  iid: number;
+  project_id: number;
+  sha: string;
+  ref: string;
+  status: string;
+  source: string;
+  created_at: string;
+  updated_at: string;
+  web_url: string;
+}
+
+export interface DiffResponse {
+  diff: string;
+  new_path: string;
+  old_path: string;
+  a_mode: string;
+  b_mode: string;
+  new_file: boolean;
+  renamed_file: boolean;
+  deleted_file: boolean;
+  generated_file: boolean;
 }

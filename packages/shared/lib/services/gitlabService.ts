@@ -1,6 +1,6 @@
 import { GitlabApi } from './gitlabApi';
 import { GitlabCache } from './gitlabCache';
-import type { Environment, MergeRequest } from './types';
+import type { EnvironmentResponse, MergeRequestResponse } from './types';
 import type { GitlabConfigItem } from '@extension/storage';
 
 function extractMRFromUrl(mrUrl: string, hostname: string) {
@@ -81,8 +81,8 @@ export class GitLabService {
     return this.api.getMREnvironments(projectId, ref);
   }
 
-  async getMRList(projectId: string | number): Promise<MergeRequest[]> {
-    const cached = this.cache.get<MergeRequest[]>(projectId);
+  async getMRList(projectId: string | number): Promise<MergeRequestResponse[]> {
+    const cached = this.cache.get<MergeRequestResponse[]>(projectId);
     if (cached) return cached;
 
     const data = await this.api.getMRList(projectId);
@@ -91,10 +91,10 @@ export class GitLabService {
     return data;
   }
 
-  async getMRByUrl(url: string): Promise<MergeRequest> {
+  async fetchMR(url: string) {
     const { projectId, mrIid } = extractMRFromUrl(url, this.getApiHostname());
 
-    const cached = this.cache.get<MergeRequest>(projectId, mrIid);
+    const cached = this.cache.get<MergeRequestResponse>(projectId, mrIid);
     if (cached) return cached;
 
     const data = await this.api.getMRById(projectId, mrIid);
@@ -103,20 +103,32 @@ export class GitLabService {
     return data;
   }
 
-  async getMRReviewApp(projectId: string | number, ref: string): Promise<Environment | undefined> {
+  async fetchCommits(projectId: string | number, mrIid: string | number) {
+    return await this.api.getMRCommits(projectId, mrIid);
+  }
+
+  async fetchPipelines(projectId: string | number, mrIid: string | number) {
+    return await this.api.getMRPipelines(projectId, mrIid);
+  }
+
+  async fetchDiff(projectId: string | number, mrIid: string | number) {
+    return await this.api.getMRDiff(projectId, mrIid);
+  }
+
+  async fetchReviewApp(projectId: string | number, ref: string): Promise<EnvironmentResponse | undefined> {
     const envs = await this.getMREnvironments(projectId, ref);
 
     return envs.find((env: { external_url?: string }) => env.external_url);
   }
 
-  async mergeMR(projectId: string | number, mrIid: string | number): Promise<MergeRequest> {
+  async mergeMR(projectId: string | number, mrIid: string | number): Promise<MergeRequestResponse> {
     const data = await this.api.mergeMR(projectId, mrIid);
     this.cache.updateMR(data);
 
     return data;
   }
 
-  async closeMR(projectId: string | number, mrIid: string | number): Promise<MergeRequest> {
+  async closeMR(projectId: string | number, mrIid: string | number): Promise<MergeRequestResponse> {
     const data = await this.api.closeMR(projectId, mrIid);
     this.cache.updateMR(data);
 

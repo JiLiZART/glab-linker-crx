@@ -1,4 +1,5 @@
-import { Card, Checkbox, MergeRequestCard } from '@extension/ui';
+import { Card, Checkbox } from '@extension/ui';
+import { MergeRequestCard } from '@extension/shared';
 import { useFormValues } from '@src/form';
 import type { OptionsFormControl } from '@src/types';
 import { Controller } from 'react-hook-form';

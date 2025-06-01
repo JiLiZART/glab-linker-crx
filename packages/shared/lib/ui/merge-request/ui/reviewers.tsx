@@ -20,7 +20,7 @@ interface ReviewersProps {
 
 export const Reviewers: FC<ReviewersProps> = ({ reviewers = [] }) => {
   if (!reviewers?.length) {
-    return null
+    return null;
   }
 
   return (
@@ -42,9 +42,7 @@ export const Reviewers: FC<ReviewersProps> = ({ reviewers = [] }) => {
           ))}
         </TooltipProvider>
       </div>
-      <span className="text-muted-foreground text-sm">
-        {reviewers.length} reviewers
-      </span>
+      <span className="text-muted-foreground text-sm">{reviewers.length} reviewers</span>
     </div>
   );
 };

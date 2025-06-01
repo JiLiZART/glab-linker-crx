@@ -1,4 +1,10 @@
-import type { Environment, MergeRequest } from './types';
+import type {
+  CommitResponse,
+  DiffResponse,
+  EnvironmentResponse,
+  MergeRequestResponse,
+  PipelineResponse,
+} from './types';
 
 export const GITLAB_BASE = 'https://gitlab.com';
 
@@ -51,27 +57,48 @@ export class GitlabApi {
     return this.api<unknown[]>('projects', 'GET');
   }
 
+  async getMRCommits(projectId: string | number, mrIid: string | number) {
+    return this.api<CommitResponse[]>(
+      `projects/${encodeURIComponent(projectId)}/merge_requests/${mrIid}/commits`,
+      'GET',
+    );
+  }
+
+  async getMRPipelines(projectId: string | number, mrIid: string | number) {
+    return this.api<PipelineResponse[]>(
+      `projects/${encodeURIComponent(projectId)}/merge_requests/${mrIid}/pipelines`,
+      'GET',
+    );
+  }
+
+  async getMRDiff(projectId: string | number, mrIid: string | number) {
+    return this.api<DiffResponse[]>(`projects/${encodeURIComponent(projectId)}/merge_requests/${mrIid}/diff`, 'GET');
+  }
+
   async getMREnvironments(projectId: string | number, ref: string) {
-    return this.api<Environment[]>(
+    return this.api<EnvironmentResponse[]>(
       `projects/${encodeURIComponent(projectId)}/environments?search=${encodeURIComponent(ref)}`,
       'GET',
     );
   }
 
   async getMRList(projectId: string | number) {
-    return this.api<MergeRequest[]>(`projects/${encodeURIComponent(projectId)}/merge_requests`, 'GET');
+    return this.api<MergeRequestResponse[]>(`projects/${encodeURIComponent(projectId)}/merge_requests`, 'GET');
   }
 
   async getMRById(projectId: string | number, mrIid: string | number) {
-    return this.api<MergeRequest>(`projects/${encodeURIComponent(projectId)}/merge_requests/${mrIid}`, 'GET');
+    return this.api<MergeRequestResponse>(`projects/${encodeURIComponent(projectId)}/merge_requests/${mrIid}`, 'GET');
   }
 
   async mergeMR(projectId: string | number, mrIid: string | number) {
-    return this.api<MergeRequest>(`projects/${encodeURIComponent(projectId)}/merge_requests/${mrIid}/merge`, 'PUT');
+    return this.api<MergeRequestResponse>(
+      `projects/${encodeURIComponent(projectId)}/merge_requests/${mrIid}/merge`,
+      'PUT',
+    );
   }
 
   async closeMR(projectId: string | number, mrIid: string | number) {
-    return this.api<MergeRequest>(`projects/${encodeURIComponent(projectId)}/merge_requests/${mrIid}`, 'PUT', {
+    return this.api<MergeRequestResponse>(`projects/${encodeURIComponent(projectId)}/merge_requests/${mrIid}`, 'PUT', {
       state_event: 'close',
     });
   }
