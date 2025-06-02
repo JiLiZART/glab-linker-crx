@@ -122,8 +122,6 @@ export function MergeRequestCard(props: MergeRequestCardProps) {
     }
   };
 
-  console.log({ mr, isAnimating, isLoading });
-
   if (isLoading || !mr) {
     return <SkeletonCard />;
   }
@@ -156,17 +154,18 @@ export function MergeRequestCard(props: MergeRequestCardProps) {
 
         <CardHeader className="space-y-4">
           <div className="flex flex-col items-start gap-4">
-            <div className="flex flex-col items-start">
-              <div className="flex items-center gap-2">
-                {showAvatar && <AuthorAvatar mr={mr} />}
+            <div className="flex items-center gap-2">
+              <AuthorAvatar mr={mr} />
+              <div className="flex flex-col items-start gap-1">
                 <h2 className="font-semibold leading-none">{mr.title}</h2>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="text-muted-foreground text-sm">by {mr.author.name}</div>
-                <Badge variant="outline" className="ml-2">
-                  !{mr.id}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <div className="text-muted-foreground text-sm">by {mr.author.name}</div>
+                  <a href={mr.url} target="_blank" rel="noreferrer noopener">
+                    <Badge variant="outline" className="ml-2">
+                      !{mr.id}
+                    </Badge>
+                  </a>
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-2">

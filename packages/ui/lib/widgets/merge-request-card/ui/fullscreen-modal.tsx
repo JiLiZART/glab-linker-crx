@@ -1,7 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, Tabs, TabsContent, TabsList, TabsTrigger, Button, Badge, Checkbox, Skeleton } from '@/index';
+import {
+  Card,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Button,
+  Badge,
+  Checkbox,
+  Skeleton,
+  AvatarImage,
+  AvatarFallback,
+  Avatar,
+} from '@/index';
 import {
   RefreshCcw,
   Minimize2,
@@ -22,9 +35,10 @@ import { AvatarStack } from './avatar-stack';
 import { CommitList } from './commit-list';
 import { PipelineList } from './pipeline-list';
 import { DiffTree } from './diff-tree';
+import { BranchInfo } from './branch-info';
+import { ReviewAppButton } from './review-app-button';
 
 import type { ChangeModel, CommitModel, MergeRequestModel, PipelineModel, ReviewAppModel } from '@extension/shared';
-import { ReviewAppButton } from './review-app-button';
 
 interface FullscreenModalProps {
   mr?: MergeRequestModel;
@@ -124,9 +138,14 @@ export function FullscreenModal(props: FullscreenModalProps) {
       <div className="flex h-full flex-col">
         {/* Header */}
         <div className="flex items-center justify-between border-b p-4">
-          <div className="flex items-center">
-            <h2 className="mr-2 text-xl font-semibold">{mr.title}</h2>
-            <Badge variant="outline">!{mr.id}</Badge>
+          <div className="flex flex-col items-start gap-1">
+            <div className="flex items-center">
+              <h2 className="mr-2 text-xl font-semibold">{mr.title}</h2>
+              <a href={mr.url} target="_blank" rel="noreferrer noopener">
+                <Badge variant="outline">!{mr.id}</Badge>
+              </a>
+            </div>
+            <BranchInfo sourceBranch={mr.sourceBranch} targetBranch={mr.targetBranch} />
           </div>
 
           <div className="flex items-center space-x-2">
@@ -182,7 +201,7 @@ export function FullscreenModal(props: FullscreenModalProps) {
             </div>
 
             <div className="flex-1 overflow-auto">
-              <TabsContent value="overview" className="h-full p-6">
+              <TabsContent value="overview" className="h-full p-4">
                 <div className="grid h-full grid-cols-3 gap-6">
                   <div className="col-span-2 space-y-6">
                     <div>
@@ -258,11 +277,10 @@ export function FullscreenModal(props: FullscreenModalProps) {
                         <div>
                           <p className="mb-1 text-sm text-gray-500">Author</p>
                           <div className="flex items-center">
-                            <img
-                              src={mr.author.avatarUrl || '/placeholder.svg'}
-                              alt={mr.author.name}
-                              className="mr-2 size-6 rounded-full"
-                            />
+                            <Avatar className="border-background mr-1 size-4 rounded-full border-2">
+                              <AvatarImage src={mr.author.avatarUrl} alt={mr.author.name} />
+                              <AvatarFallback>{mr.author.name[0]}</AvatarFallback>
+                            </Avatar>
                             <span className="text-sm font-medium">{mr.author.name}</span>
                           </div>
                         </div>
@@ -288,16 +306,6 @@ export function FullscreenModal(props: FullscreenModalProps) {
                           <p className="mb-1 text-sm text-gray-500">Updated</p>
                           <p className="text-sm">{new Date(mr.updatedAt).toLocaleString()}</p>
                         </div>
-
-                        <div>
-                          <p className="mb-1 text-sm text-gray-500">Source branch</p>
-                          <p className="rounded bg-gray-100 px-2 py-1 font-mono text-sm">{mr.sourceBranch}</p>
-                        </div>
-
-                        <div>
-                          <p className="mb-1 text-sm text-gray-500">Target branch</p>
-                          <p className="rounded bg-gray-100 px-2 py-1 font-mono text-sm">{mr.targetBranch}</p>
-                        </div>
                       </div>
                     </div>
 
@@ -308,15 +316,15 @@ export function FullscreenModal(props: FullscreenModalProps) {
                 </div>
               </TabsContent>
 
-              <TabsContent value="commits" className="p-6">
+              <TabsContent value="commits" className="p-4">
                 <CommitList commits={commits} />
               </TabsContent>
 
-              <TabsContent value="pipelines" className="p-6">
+              <TabsContent value="pipelines" className="p-4">
                 <PipelineList pipelines={pipelines} />
               </TabsContent>
 
-              <TabsContent value="changes" className="p-6">
+              <TabsContent value="changes" className="p-4">
                 <DiffTree changes={diff} />
               </TabsContent>
             </div>
