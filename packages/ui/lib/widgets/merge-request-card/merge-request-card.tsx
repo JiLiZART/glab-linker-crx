@@ -144,7 +144,9 @@ export function MergeRequestCard(props: MergeRequestCardProps) {
 
   return (
     <>
-      <Card id="mr-card" className="relative w-full max-w-2xl shadow-md transition-all duration-300 hover:shadow-lg">
+      <Card
+        id="mr-card"
+        className="relative w-full min-w-[600px] max-w-2xl shadow-md transition-all duration-300 hover:shadow-lg">
         <div className="absolute right-2 top-2 flex items-center gap-2">
           <ReviewAppButton reviewApp={reviewApp} />
           {refreshButton}
@@ -176,9 +178,11 @@ export function MergeRequestCard(props: MergeRequestCardProps) {
         </CardHeader>
 
         <CardContent className="pt-0">
-          <div className="mb-4 max-h-32 overflow-y-auto rounded-md border bg-gray-50 p-3">
-            <MarkdownRenderer content={mr.description} />
-          </div>
+          {mr.description && (
+            <div className="mb-4 max-h-32 overflow-y-auto rounded-md border bg-gray-50 p-3">
+              <MarkdownRenderer content={mr.description} />
+            </div>
+          )}
 
           <div className="flex flex-col gap-4">
             <BranchInfo sourceBranch={mr.sourceBranch} targetBranch={mr.targetBranch} />
@@ -236,7 +240,7 @@ export function MergeRequestCard(props: MergeRequestCardProps) {
           className="fixed inset-0 z-50 bg-black bg-opacity-50 transition-opacity duration-300"
           style={{ opacity: isAnimating ? 1 : 0 }}>
           <div
-            className="absolute w-full max-w-2xl rounded-md bg-white shadow-xl transition-all duration-300 ease-in-out"
+            className="absolute w-full min-w-[600px] max-w-2xl rounded-md bg-white shadow-xl transition-all duration-300 ease-in-out"
             style={{
               top: cardPosition.top,
               left: cardPosition.left,

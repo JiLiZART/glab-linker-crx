@@ -26,6 +26,12 @@ export default function ContentUI() {
       return;
     }
 
+    const url = getMRUrl(el?.href);
+
+    if (!url) {
+      return;
+    }
+
     const { clientX, clientY } = e;
 
     setPositionRef({
@@ -42,12 +48,6 @@ export default function ContentUI() {
         };
       },
     });
-
-    const url = getMRUrl(el?.href);
-
-    if (!url) {
-      return;
-    }
 
     setIsFullscreen(false);
     onOpen?.();

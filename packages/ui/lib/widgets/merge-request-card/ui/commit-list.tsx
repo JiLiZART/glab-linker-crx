@@ -68,7 +68,8 @@ export function CommitList({ commits }: CommitListProps) {
 
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between">
-                    <TooltipWrapper text={<div className="text-sm max-w-2xl font-medium">{commit.description}</div>}>
+                    <TooltipWrapper
+                      text={<div className="text-sm max-w-[320px] font-medium">{commit.description}</div>}>
                       <h4 className="truncate text-sm font-medium">{commit.message}</h4>
                     </TooltipWrapper>
 
