@@ -154,88 +154,75 @@ export function DiffTree({ changes }: DiffTreeProps) {
   if (loading || !data) {
     return (
       <div className="space-y-4">
-        <h3 className="text-lg font-medium">Changes</h3>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-sm">
-              <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <Skeleton className="h-5 w-24" />
-                  <Skeleton className="h-5 w-24" />
-                  <Skeleton className="h-5 w-24" />
-                </div>
-                <Skeleton className="h-5 w-64" />
-              </div>
+        <h3 className="text-lg font-medium mb-0">Changes</h3>
 
-              <div className="rounded-md border p-2">
-                <div className="space-y-2">
-                  {[1, 2, 3, 4, 5].map(i => (
-                    <div key={i} className="flex items-center p-2">
-                      <Skeleton className="mr-1 size-4" />
-                      <Skeleton className="mr-1 size-4" />
-                      <Skeleton className="h-4 w-40" />
-                      <div className="ml-auto flex items-center space-x-2">
-                        <Skeleton className="h-5 w-16" />
-                        <Skeleton className="h-4 w-12" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+        <div className="text-sm">
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Skeleton className="h-5 w-24" />
+              <Skeleton className="h-5 w-24" />
+              <Skeleton className="h-5 w-24" />
             </div>
-          </CardContent>
-        </Card>
+            <Skeleton className="h-5 w-64" />
+          </div>
+
+          <div className="rounded-md border p-2">
+            <div className="space-y-2">
+              {[1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="flex items-center p-2">
+                  <Skeleton className="mr-1 size-4" />
+                  <Skeleton className="mr-1 size-4" />
+                  <Skeleton className="h-4 w-40" />
+                  <div className="ml-auto flex items-center space-x-2">
+                    <Skeleton className="h-5 w-16" />
+                    <Skeleton className="h-4 w-12" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium">Changes</h3>
+      <h3 className="text-lg font-medium  mb-0">Changes</h3>
 
-      <Card>
-        <CardContent className="p-4">
-          <div className="text-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center">
-                  <Plus className="mr-1 size-4 text-green-500" />
-                  <span>{stats.added} added</span>
-                </div>
-                <div className="flex items-center">
-                  <Minus className="mr-1 size-4 text-red-500" />
-                  <span>{stats.removed} removed</span>
-                </div>
-                <div className="flex items-center">
-                  <FileText className="mr-1 size-4 text-blue-500" />
-                  <span>{stats.modified} modified</span>
-                </div>
-              </div>
-
-              <span className="text-gray-500">
-                {data.totalFiles} files changed with {stats.additions} additions and {stats.deletions} deletions
-              </span>
+      <div className="text-sm">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center">
+              <Plus className="mr-1 size-4 text-green-500" />
+              <span>{stats.added} added</span>
             </div>
-
-            <div className="rounded-md border">
-              <TreeFolder
-                name="/"
-                files={data.files}
-                level={0}
-                onFileClick={setSelectedFile}
-                selectedFile={selectedFile}
-              />
+            <div className="flex items-center">
+              <Minus className="mr-1 size-4 text-red-500" />
+              <span>{stats.removed} removed</span>
             </div>
-
-            {selectedFile && diff && (
-              <div className="mt-4">
-                <h4 className="mb-2 text-sm font-medium">File: {selectedFile}</h4>
-                <DiffViewer diff={diff} language={selectedFile.split('.').pop() || 'txt'} />
-              </div>
-            )}
+            <div className="flex items-center">
+              <FileText className="mr-1 size-4 text-blue-500" />
+              <span>{stats.modified} modified</span>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+
+          <span className="text-gray-500">
+            {data.totalFiles} files changed with {stats.additions} additions and {stats.deletions} deletions
+          </span>
+        </div>
+
+        <div className="rounded-md border">
+          <TreeFolder name="/" files={data.files} level={0} onFileClick={setSelectedFile} selectedFile={selectedFile} />
+        </div>
+
+        {selectedFile && diff && (
+          <div className="mt-4">
+            <h4 className="mb-2 text-sm font-medium">File: {selectedFile}</h4>
+            <DiffViewer diff={diff} language={selectedFile.split('.').pop() || 'txt'} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -21,6 +21,7 @@ export function adaptGitlabCommits(gitlabCommits: CommitResponse[]) {
     id: commit.id,
     sha: commit.id,
     message: commit.title || commit.message,
+    description: commit.message,
     author: {
       id: commit.author_name,
       name: commit.author_name,

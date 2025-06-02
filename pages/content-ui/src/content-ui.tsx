@@ -74,7 +74,7 @@ export default function ContentUI() {
 
   if (isPopupOpen) {
     return (
-      <FloatingFocusManager context={context} modal={false}>
+      <FloatingFocusManager context={context} disabled={true} modal={false}>
         <div ref={popupRef} {...popupProps}>
           <MergeRequestCard
             mr={data?.data}
