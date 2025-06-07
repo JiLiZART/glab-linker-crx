@@ -10,3 +10,9 @@ export const useFormValues = () => {
     ...getValues(), // always merge with latest form values
   };
 };
+
+export function timeout(time: number) {
+  return new Promise(resolve => {
+    setTimeout(resolve, time);
+  });
+}

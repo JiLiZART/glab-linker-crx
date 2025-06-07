@@ -1,9 +1,13 @@
 import type { Control } from 'react-hook-form';
 
 export type OptionsFormValues = {
-  // apiUrl: string;
   token: string;
   hostname: string;
+};
+
+export type OptionsFormControl = Control<OptionsFormValues>;
+
+export type SettingsFormValues = {
   prefetchLinks?: boolean;
   showDescription?: boolean;
   showAvatar?: boolean;
@@ -13,6 +17,6 @@ export type OptionsFormValues = {
 
   whitelist: string;
   blacklist: string;
-};
+}
 
-export type OptionsFormControl = Control<OptionsFormValues>;
+export type SettingsFormControl = Control<OptionsFormValues>;

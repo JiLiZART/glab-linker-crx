@@ -5,10 +5,9 @@ import type {
   MergeRequestResponse,
   PipelineResponse,
 } from './types';
+import { extractHostname } from '../utils/extract-hostname';
 
 export const GITLAB_BASE = 'https://gitlab.com';
-
-// ${encodeURIComponent(projectId)}
 
 function tryJSONParse(value: string) {
   try {
@@ -49,8 +48,7 @@ export class GitlabApi {
   }
 
   getApiHostname() {
-    const url = new URL(this.baseUrl);
-    return url.hostname;
+    return extractHostname(this.baseUrl);
   }
 
   async getProjects() {
