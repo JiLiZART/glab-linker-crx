@@ -13,59 +13,53 @@ import {
   TooltipTrigger,
 } from '@/index';
 import { RefreshCcw, Maximize2, X } from 'lucide-react';
+import { forwardRef } from 'react';
 
 interface SkeletonCardProps {
   onClose?: () => void;
 }
 
-export function SkeletonCard({ onClose }: SkeletonCardProps) {
+function TooltipWrapper({ children, text }: { children: React.ReactNode; text: React.ReactElement }) {
   return (
-    <Card className="w-full shadow-md">
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
+        <TooltipContent>{text}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+export const SkeletonCard = forwardRef<HTMLDivElement, SkeletonCardProps>(function SkeletonCard({
+  onClose,
+  ...props
+}: SkeletonCardProps) {
+  return (
+    <Card {...props} className="w-full shadow-md">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="flex w-full items-center space-x-2">
           <Skeleton className="h-6 w-3/4" />
           <Skeleton className="h-5 w-16" />
         </div>
         <div className="flex items-center space-x-1">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" disabled>
-                  <RefreshCcw className="size-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Refresh merge request</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <TooltipWrapper text={<p>Refresh merge request</p>}>
+            <Button variant="ghost" size="icon" disabled>
+              <RefreshCcw className="size-4" />
+            </Button>
+          </TooltipWrapper>
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" disabled>
-                  <Maximize2 className="size-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>View in fullscreen</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <TooltipWrapper text={<p>View in fullscreen</p>}>
+            <Button variant="ghost" size="icon" disabled>
+              <Maximize2 className="size-4" />
+            </Button>
+          </TooltipWrapper>
 
           {onClose && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={onClose}>
-                    <X className="size-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Close</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <TooltipWrapper text={<p>Close</p>}>
+              <Button variant="ghost" size="icon" onClick={onClose}>
+                <X className="size-4" />
+              </Button>
+            </TooltipWrapper>
           )}
         </div>
       </CardHeader>
@@ -120,4 +114,4 @@ export function SkeletonCard({ onClose }: SkeletonCardProps) {
       </CardFooter>
     </Card>
   );
-}
+});

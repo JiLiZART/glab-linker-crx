@@ -43,53 +43,45 @@ async function fetchFullMR(url: string | null) {
 
   return {
     data: data,
-    reivewApp() {
-      return gitlab
-        .reviewApp(mrRes?.pipeline?.project_id, mrRes?.pipeline?.ref)
-        .then(envRes => {
-          return envRes ? adaptGitlabReviewApp(envRes) : undefined;
-        })
-        .catch(err => {
-          console.log('gitlab.fetchReviewApp', err);
-          debugger;
-          return undefined;
-        });
+    async reviewApp() {
+      try {
+        let envRes = await gitlab.reviewApp(mrRes?.pipeline?.project_id, mrRes?.pipeline?.ref);
+        return envRes ? adaptGitlabReviewApp(envRes) : undefined;
+      } catch (err) {
+        console.log('gitlab.fetchReviewApp', err);
+        debugger;
+        return undefined;
+      }
     },
-    commits() {
-      return gitlab
-        .commits(mrRes?.project_id, mrRes?.iid)
-        .then(commitsRes => {
-          return commitsRes ? adaptGitlabCommits(commitsRes) : undefined;
-        })
-        .catch(err => {
-          console.log('gitlab.fetchCommits', err);
-          debugger;
-          return undefined;
-        });
+    async commits() {
+      try {
+        let commitsRes = await gitlab.commits(mrRes?.project_id, mrRes?.iid);
+        return commitsRes ? adaptGitlabCommits(commitsRes) : undefined;
+      } catch (err) {
+        console.log('gitlab.fetchCommits', err);
+        debugger;
+        return undefined;
+      }
     },
-    pipelines() {
-      return gitlab
-        .pipelines(mrRes?.project_id, mrRes?.iid)
-        .then(pipelinesRes => {
-          return pipelinesRes ? adaptGitlabPipelines(pipelinesRes) : undefined;
-        })
-        .catch(err => {
-          console.log('gitlab.fetchPipelines', err);
-          debugger;
-          return undefined;
-        });
+    async pipelines() {
+      try {
+        let pipelinesRes = await gitlab.pipelines(mrRes?.project_id, mrRes?.iid);
+        return pipelinesRes ? adaptGitlabPipelines(pipelinesRes) : undefined;
+      } catch (err) {
+        console.log('gitlab.fetchPipelines', err);
+        debugger;
+        return undefined;
+      }
     },
-    diff() {
-      return gitlab
-        .diff(mrRes?.project_id, mrRes?.iid)
-        .then(diffRes => {
-          return diffRes ? adaptGitlabDiff(diffRes) : undefined;
-        })
-        .catch(err => {
-          console.log('gitlab.fetchDiff', err);
-          debugger;
-          return undefined;
-        });
+    async diff() {
+      try {
+        let diffRes = await gitlab.diff(mrRes?.project_id, mrRes?.iid);
+        return diffRes ? adaptGitlabDiff(diffRes) : undefined;
+      } catch (err) {
+        console.log('gitlab.fetchDiff', err);
+        debugger;
+        return undefined;
+      }
     },
   };
 }
@@ -213,7 +205,6 @@ class GitlabBrokerService {
     await instance.mrClose(mr.data.projectId, mr.data.iid);
 
     return await asCached(url, () => fetchFullMR(url), true);
-
   }
 }
 

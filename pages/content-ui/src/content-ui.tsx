@@ -1,11 +1,12 @@
 import { FloatingFocusManager } from '@floating-ui/react';
-import { useMergeRequest, usePopup, useDocumentEvent, usePrecacheAll, getMRUrl } from '@extension/shared';
+import { useMergeRequest, useFloatingPopup, useDocumentEvent, usePrecacheAll, useSettings } from '@extension/shared';
 import { MergeRequestCard, FullscreenModal } from '@extension/ui';
 import { useState } from 'react';
 
 export default function ContentUI() {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const { action, refresh, data, onMerge, onClose: onCloseMR } = useMergeRequest();
+  const settings = useSettings();
+  const { fetch, refresh, data, onMerge, onClose: onCloseMR } = useMergeRequest();
   const {
     isOpen: isPopupOpen,
     onOpen,
@@ -14,11 +15,15 @@ export default function ContentUI() {
     popupRef,
     popupProps,
     setPositionRef,
-  } = usePopup();
+  } = useFloatingPopup({
+    position: settings.position,
+  });
 
   usePrecacheAll();
 
-  useDocumentEvent('mouseover', async (e: MouseEvent) => {
+  console.log('ContentUI.render');
+
+  useDocumentEvent('mouseover', async e => {
     const target = e.target as HTMLElement;
     const el = target.closest('a');
 
@@ -26,9 +31,7 @@ export default function ContentUI() {
       return;
     }
 
-    const url = getMRUrl(el?.href);
-
-    if (!url) {
+    if (!el?.href) {
       return;
     }
 
@@ -52,7 +55,7 @@ export default function ContentUI() {
     setIsFullscreen(false);
     onOpen?.();
 
-    await action(url);
+    await fetch(el?.href);
   });
 
   if (isFullscreen) {
@@ -75,20 +78,23 @@ export default function ContentUI() {
   if (isPopupOpen) {
     return (
       <FloatingFocusManager context={context} disabled={true} modal={false}>
-        <div ref={popupRef} {...popupProps}>
-          <MergeRequestCard
-            mr={data?.data}
-            reviewApp={data?.reivewApp}
-            isLoading={!data}
-            onRefreshMR={refresh}
-            onMergeMR={onMerge}
-            onCloseMR={onCloseMR}
-            onClose={onPopupClose}
-            onFullscreen={() => {
-              setIsFullscreen(true);
-            }}
-          />
-        </div>
+        <MergeRequestCard
+          rootRef={popupRef}
+          rootProps={popupProps}
+          showDescription={settings.showDescription}
+          showAvatar={settings.showAvatar}
+          showMerge={settings.showMerge}
+          mr={data?.data}
+          reviewApp={data?.reviewApp}
+          isLoading={!data}
+          onRefreshMR={refresh}
+          onMergeMR={onMerge}
+          onCloseMR={onCloseMR}
+          onClose={onPopupClose}
+          onFullscreen={() => {
+            setIsFullscreen(true);
+          }}
+        />
       </FloatingFocusManager>
     );
   }

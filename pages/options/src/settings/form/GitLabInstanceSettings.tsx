@@ -2,7 +2,7 @@ import { Card, Input } from '@extension/ui';
 import { ExternalLink } from 'lucide-react';
 import type { OptionsFormControl } from '@src/types';
 import { Controller } from 'react-hook-form';
-import { useFormValues } from '@src/form';
+import { useFormValues } from '@src/util';
 
 const Header = () => {
   const values = useFormValues();

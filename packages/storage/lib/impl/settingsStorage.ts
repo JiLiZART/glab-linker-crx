@@ -12,20 +12,48 @@ type SettingsType = {
 
   whitelist?: string;
   blacklist?: string;
-}
-
-type SettingsStorage = BaseStorage<string> & {
-  setUrl: (val: string) => Promise<void>;
 };
 
-const storage = createStorage<string>('gitlab-url', 'https://gitlab.com', {
-  storageEnum: StorageEnum.Local,
+type SettingsTypeKeys = keyof SettingsType;
+
+type SettingsStorage = BaseStorage<SettingsType> & {
+  setKeyValue: (name: string, value: unknown) => Promise<void>;
+  getKeyValue: (name: string) => Promise<unknown>;
+};
+
+const defaultSettings: SettingsType = {
+  prefetchLinks: false,
+  showDescription: true,
+  showAvatar: true,
+  showMerge: true,
+
+  position: 'left-top',
+
+  whitelist: '',
+  blacklist: '',
+};
+
+const storage = createStorage<SettingsType>('glab-linker-settings', defaultSettings, {
+  storageEnum: StorageEnum.Sync,
   liveUpdate: true,
 });
 
-export const gitlabApiUrlStorage: SettingsStorage = {
+export const settingsStorage: SettingsStorage = {
   ...storage,
-  setUrl: async (val: string) => {
-    await storage.set(val);
+
+  setKeyValue: async (name: string, value: unknown) => {
+    const config = await storage.get();
+
+    const key = name as SettingsTypeKeys;
+
+    await storage.set({ ...config, [key]: value });
+  },
+
+  getKeyValue: async (name: string) => {
+    const config = await storage.get();
+
+    const key = name as SettingsTypeKeys;
+
+    return config[key];
   },
 };

@@ -45,7 +45,7 @@ export function watchRebuildPlugin(config: PluginConfig): PluginOption {
 
   return {
     name: 'watch-rebuild',
-    writeBundle() {
+    closeBundle() {
       config.onStart?.();
       if (!ws) {
         initializeWebSocket();
@@ -57,6 +57,18 @@ export function watchRebuildPlugin(config: PluginConfig): PluginOption {
        */
       ws.send(MessageInterpreter.send({ type: BUILD_COMPLETE, id }));
     },
+    // writeBundle() {
+    //   config.onStart?.();
+    //   if (!ws) {
+    //     initializeWebSocket();
+    //     return;
+    //   }
+    //   /**
+    //    * When the build is complete, send a message to the reload server.
+    //    * The reload server will send a message to the client to reload or refresh the extension.
+    //    */
+    //   ws.send(MessageInterpreter.send({ type: BUILD_COMPLETE, id }));
+    // },
     generateBundle(_options, bundle) {
       for (const module of Object.values(bundle)) {
         if (module.type === 'chunk') {

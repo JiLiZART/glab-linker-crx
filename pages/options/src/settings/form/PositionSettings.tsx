@@ -1,8 +1,8 @@
 import { RadioGroup, RadioGroupItem, Card } from '@extension/ui';
-import type { OptionsFormControl } from '@src/types';
+import type { SettingsFormControl } from '@src/types';
 import { Controller } from 'react-hook-form';
 
-export const PositionSettings = ({ control }: { control: OptionsFormControl }) => {
+export const PositionSettings = ({ control }: { control: SettingsFormControl }) => {
   return (
     <Card className="p-6">
       <h2 className="mb-4 text-lg font-semibold">Position Settings</h2>

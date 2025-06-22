@@ -1,5 +1,4 @@
-
-export function getMRUrl(url?: string) {
+export function getMRUrl(url?: string | null) {
   if (!url) {
     return null;
   }

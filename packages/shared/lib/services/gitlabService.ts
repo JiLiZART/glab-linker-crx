@@ -1,4 +1,4 @@
-import { extractMRFromUrl } from 'lib/utils/extract-mr-from-url';
+import { extractMRFromUrl } from '../utils/extract-mr-from-url';
 import { GitlabApi } from './gitlabApi';
 import type { EnvironmentResponse, MergeRequestResponse } from './types';
 
@@ -45,7 +45,6 @@ export class GitLabService {
   }
 
   async mrList(projectId: string | number): Promise<MergeRequestResponse[]> {
-
     return this.api.getMRList(projectId);
   }
 
@@ -78,6 +77,6 @@ export class GitLabService {
   }
 
   async mrClose(projectId: string | number, mrIid: string | number): Promise<MergeRequestResponse> {
-    return this.api.closeMR(projectId, mrIid)
+    return this.api.closeMR(projectId, mrIid);
   }
 }

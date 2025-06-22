@@ -1,8 +1,8 @@
 import { Card, Checkbox } from '@extension/ui';
-import type { OptionsFormControl } from '@src/types';
+import type { SettingsFormControl } from '@src/types';
 import { Controller } from 'react-hook-form';
 
-export const AdvancedSettings = ({ control }: { control: OptionsFormControl }) => {
+export const AdvancedSettings = ({ control }: { control: SettingsFormControl }) => {
   return (
     <Card className="p-6">
       <h2 className="mb-4 text-lg font-semibold">Advanced Settings</h2>

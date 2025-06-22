@@ -20,7 +20,7 @@ export type InstancesStorage = BaseStorage<InstanceConfig[]> & {
   items: () => Promise<InstanceConfig[]>;
 };
 
-const storage = createStorage<InstanceConfig[]>('glab-items', [], {
+const storage = createStorage<InstanceConfig[]>('glab-linker-items', [], {
   storageEnum: StorageEnum.Local,
   liveUpdate: true,
   serialization: jsonSerialization,

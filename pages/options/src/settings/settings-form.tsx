@@ -1,24 +1,21 @@
-import { GitLabInstanceSettings } from './form/GitLabInstanceSettings';
 import { URLPatternSettings } from './form/URLPatternSettings';
 import { DisplaySettings } from './form/DisplaySettings';
 import { PositionSettings } from './form/PositionSettings';
 import { AdvancedSettings } from './form/AdvancedSettings';
 import { Actions } from './form/Actions';
 import { useForm, FormProvider } from 'react-hook-form';
-import type { OptionsFormValues } from '@src/types';
+import type { SettingsFormValues } from '@src/types';
 import { useState } from 'react';
 import { timeout } from '@src/util';
 
-const NOT_AUTHORIZED_ERROR = '401 Unauthorized';
-
-export type InstanceFormProps = {
-  onSave: (values: OptionsFormValues) => Promise<void>;
-  defaultValues?: Partial<OptionsFormValues>;
+export type SettingsFormProps = {
+  onSave: (values: SettingsFormValues) => Promise<void>;
+  defaultValues?: Partial<SettingsFormValues>;
 };
 
-export const SettingsForm = (props: InstanceFormProps) => {
+export const SettingsForm = (props: SettingsFormProps) => {
   const { onSave, defaultValues } = props;
-  const methods = useForm<OptionsFormValues>({
+  const methods = useForm<SettingsFormValues>({
     defaultValues: defaultValues,
     shouldFocusError: true,
     reValidateMode: 'onChange',
@@ -27,7 +24,7 @@ export const SettingsForm = (props: InstanceFormProps) => {
   const { handleSubmit, formState, control } = methods;
   const { isSubmitting } = formState;
 
-  const onSubmit = async (values: OptionsFormValues) => {
+  const onSubmit = async (values: SettingsFormValues) => {
     console.log({ values });
 
     try {

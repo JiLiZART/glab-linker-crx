@@ -1,9 +1,6 @@
+import { settingsStorage } from '@extension/storage';
+import { useStorage } from './useStorage';
+
 export function useSettings() {
-  return function (url: string | null) {
-    return {
-      position: 'left-top',
-      whitelist: 'https://gitlab.example.com',
-      blacklist: 'https://gitlab.example.com',
-    };
-  };
+  return useStorage(settingsStorage);
 }

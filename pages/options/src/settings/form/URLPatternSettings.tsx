@@ -1,8 +1,8 @@
 import { Card, Textarea } from '@extension/ui';
-import type { OptionsFormControl } from '@src/types';
+import type { SettingsFormControl } from '@src/types';
 import { Controller } from 'react-hook-form';
 
-export const URLPatternSettings = ({ control }: { control: OptionsFormControl }) => {
+export const URLPatternSettings = ({ control }: { control: SettingsFormControl }) => {
   return (
     <Card className="p-6">
       <h2 className="mb-4 text-lg font-semibold">URL Pattern Settings</h2>

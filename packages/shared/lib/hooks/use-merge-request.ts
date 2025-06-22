@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import type { FullMergeRequest } from '../services';
 import { glabBroker } from '../services';
+import { getMRUrl } from '../utils/get-mr-url';
 
 export function useMergeRequest() {
   const [actualUrl, setActualUrl] = useState<string | null>(null);
@@ -12,7 +13,7 @@ export function useMergeRequest() {
         return;
       }
 
-      const mr = await glabBroker.getFullMR(url);
+      const mr = await glabBroker.mr(url);
 
       dataRef.current.set(url, mr);
 
@@ -22,7 +23,9 @@ export function useMergeRequest() {
   );
 
   const fetch = useCallback(
-    async (url: string | null) => {
+    async (href: string | null) => {
+      const url = getMRUrl(href);
+
       if (await precache(url)) {
         setActualUrl(url);
       }
@@ -33,7 +36,7 @@ export function useMergeRequest() {
   );
 
   async function onMerge(url: string) {
-    const newMr = await glabBroker.mergeMR(url);
+    const newMr = await glabBroker.mrMerge(url);
 
     if (newMr) {
       setActualUrl(url);
@@ -42,7 +45,7 @@ export function useMergeRequest() {
   }
 
   async function onClose(url: string) {
-    const newMr = await glabBroker.closeMR(url);
+    const newMr = await glabBroker.mrClose(url);
 
     if (newMr) {
       setActualUrl(url);
@@ -53,13 +56,13 @@ export function useMergeRequest() {
   async function refresh() {
     if (actualUrl) {
       const url = actualUrl;
-      const newMr = await glabBroker.getFullMR(url, true);
+      const newMr = await glabBroker.mr(url, true);
       dataRef.current.set(url, newMr);
     }
   }
 
   return {
-    action: fetch,
+    fetch,
     precache,
     refresh,
     url: actualUrl,

@@ -24,6 +24,8 @@ import { BranchInfo } from './ui/branch-info';
 import type { MergeRequestModel, ReviewAppModel } from '@extension/shared';
 
 interface MergeRequestCardProps {
+  rootRef?: React.RefObject<HTMLDivElement>;
+  rootProps?: React.HTMLAttributes<HTMLDivElement>;
   mr?: MergeRequestModel;
   reviewApp?: () => Promise<ReviewAppModel | undefined>;
   isLoading?: boolean;
@@ -34,6 +36,8 @@ interface MergeRequestCardProps {
   onCloseMR?: (url: string) => Promise<void>;
   onClose?: () => void;
   showAvatar?: boolean;
+  showDescription?: boolean;
+  showMerge?: boolean;
 }
 
 function CloseButton(props: Pick<MergeRequestCardProps, 'mr' | 'onClose'>) {
@@ -76,6 +80,8 @@ function AuthorAvatar(props: Pick<MergeRequestCardProps, 'mr'>) {
 export function MergeRequestCard(props: MergeRequestCardProps) {
   const {
     showAvatar = true,
+    rootRef,
+    rootProps,
     mr,
     reviewApp,
     isLoading,
@@ -123,7 +129,7 @@ export function MergeRequestCard(props: MergeRequestCardProps) {
   };
 
   if (isLoading || !mr) {
-    return <SkeletonCard />;
+    return <SkeletonCard ref={rootRef} {...rootProps} />;
   }
 
   const fullScreenButton = (
@@ -142,9 +148,13 @@ export function MergeRequestCard(props: MergeRequestCardProps) {
     </TooltipWrapper>
   );
 
+  console.log('MergeRequestCard.tsx', { rootRef, rootProps });
+
   return (
     <>
       <Card
+        ref={rootRef}
+        {...rootProps}
         id="mr-card"
         className="relative w-full min-w-[600px] max-w-2xl shadow-md transition-all duration-300 hover:shadow-lg">
         <div className="absolute right-2 top-2 flex items-center gap-2">

@@ -1,8 +1,8 @@
 import { useFormContext, useWatch } from 'react-hook-form';
-import type { OptionsFormValues } from './types';
+import type { FieldValues } from 'react-hook-form';
 
-export const useFormValues = () => {
-  const { getValues, control } = useFormContext<OptionsFormValues>();
+export const useFormValues = <TFieldValues extends FieldValues>() => {
+  const { getValues, control } = useFormContext<TFieldValues>();
 
   return {
     ...useWatch({ control }), // subscribe to form value updates

@@ -17,6 +17,6 @@ export type SettingsFormValues = {
 
   whitelist: string;
   blacklist: string;
-}
+};
 
-export type SettingsFormControl = Control<OptionsFormValues>;
+export type SettingsFormControl = Control<SettingsFormValues>;

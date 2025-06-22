@@ -9,13 +9,12 @@ const title = 'Gitlab Linker';
 export type SidebarProps = {
   activeId?: string;
   onAddItem?: () => Promise<void>;
-  onSettingsItem?: () => Promise<void>;
   onViewItem?: (id: string) => void;
   items: Array<{ name: string; id: string }>;
 };
 
 export const Sidebar = (props: SidebarProps) => {
-  const { onAddItem, onViewItem, onSettingsItem, activeId, items = [] } = props;
+  const { onAddItem, onViewItem, activeId, items = [] } = props;
 
   return (
     <div className="min-h-screen w-64 shrink-0 border-r bg-white">
@@ -23,7 +22,7 @@ export const Sidebar = (props: SidebarProps) => {
         <SidebarHeader title={title} />
       </div>
       <div className="flex flex-col gap-3 p-3">
-        <GlobalMenuItem onSettingsItem={onSettingsItem}>Settings</GlobalMenuItem>
+        <GlobalMenuItem onSettingsItem={() => onViewItem?.('settings')}>Settings</GlobalMenuItem>
         <MenuHeader>GitLab Instances</MenuHeader>
         <div className="space-y-1">
           {items.map(item => (
