@@ -9,8 +9,9 @@ export const PositionSettings = ({ control }: { control: SettingsFormControl }) 
       <Controller
         name="position"
         control={control}
+        defaultValue="near-cursor"
         render={({ field }) => (
-          <RadioGroup {...field} defaultValue="near-cursor">
+          <RadioGroup {...field} onValueChange={value => field.onChange(value)}>
             <div className="space-y-6">
               <div>
                 <h3 className="mb-3 text-sm font-medium">Static Position</h3>

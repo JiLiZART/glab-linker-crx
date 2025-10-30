@@ -46,15 +46,15 @@ interface FullscreenModalProps {
   commits?: () => Promise<CommitModel | undefined>;
   pipelines?: () => Promise<PipelineModel | undefined>;
   reviewApp?: () => Promise<ReviewAppModel | undefined>;
-  onRefreshMR?: (url: string) => Promise<void>;
-  onApproveMR?: (url: string) => Promise<void>;
-  onMergeMR?: (url: string) => Promise<void>;
-  onCloseMR?: (url: string) => Promise<void>;
+  onMRRefresh?: (url: string) => Promise<void>;
+  onMRApprove?: (url: string) => Promise<void>;
+  onMRMerge?: (url: string) => Promise<void>;
+  onMRClose?: (url: string) => Promise<void>;
   onClose?: () => void;
 }
 
 export function FullscreenModal(props: FullscreenModalProps) {
-  const { mr, diff, commits, pipelines, reviewApp, onClose, onRefreshMR, onApproveMR, onMergeMR, onCloseMR } = props;
+  const { mr, diff, commits, pipelines, reviewApp, onClose, onMRRefresh, onMRApprove, onMRMerge, onMRClose } = props;
   const [activeTab, setActiveTab] = useState('overview');
   const [squashCommits, setSquashCommits] = useState(true);
   const [deleteSourceBranch, setDeleteSourceBranch] = useState(false);
@@ -70,26 +70,26 @@ export function FullscreenModal(props: FullscreenModalProps) {
 
   const handleMerge = async () => {
     if (mr?.url) {
-      await onMergeMR?.(mr.url);
+      await onMRMerge?.(mr.url);
     }
   };
 
   const handleApprove = async () => {
     if (mr?.url) {
-      await onApproveMR?.(mr.url);
+      await onMRApprove?.(mr.url);
     }
   };
 
   const handleClose = async () => {
     if (mr?.url) {
-      await onCloseMR?.(mr.url);
+      await onMRClose?.(mr.url);
     }
   };
 
   const handleRefresh = async () => {
     setIsLoading(true);
     if (mr?.url) {
-      await onRefreshMR?.(mr?.url);
+      await onMRRefresh?.(mr?.url);
     }
     setIsLoading(false);
   };

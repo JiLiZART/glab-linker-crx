@@ -1,6 +1,6 @@
 import type { InstanceConfig } from '@extension/storage';
 import { instancesStorage } from '@extension/storage';
-import { GitLabService } from './gitlabService';
+import { GitlabService } from './gitlab-service';
 import {
   adaptGitlabCommits,
   adaptGitlabDiff,
@@ -45,7 +45,7 @@ async function fetchFullMR(url: string | null) {
     data: data,
     async reviewApp() {
       try {
-        let envRes = await gitlab.reviewApp(mrRes?.pipeline?.project_id, mrRes?.pipeline?.ref);
+        const envRes = await gitlab.reviewApp(mrRes?.pipeline?.project_id, mrRes?.pipeline?.ref);
         return envRes ? adaptGitlabReviewApp(envRes) : undefined;
       } catch (err) {
         console.log('gitlab.fetchReviewApp', err);
@@ -55,7 +55,7 @@ async function fetchFullMR(url: string | null) {
     },
     async commits() {
       try {
-        let commitsRes = await gitlab.commits(mrRes?.project_id, mrRes?.iid);
+        const commitsRes = await gitlab.commits(mrRes?.project_id, mrRes?.iid);
         return commitsRes ? adaptGitlabCommits(commitsRes) : undefined;
       } catch (err) {
         console.log('gitlab.fetchCommits', err);
@@ -65,7 +65,7 @@ async function fetchFullMR(url: string | null) {
     },
     async pipelines() {
       try {
-        let pipelinesRes = await gitlab.pipelines(mrRes?.project_id, mrRes?.iid);
+        const pipelinesRes = await gitlab.pipelines(mrRes?.project_id, mrRes?.iid);
         return pipelinesRes ? adaptGitlabPipelines(pipelinesRes) : undefined;
       } catch (err) {
         console.log('gitlab.fetchPipelines', err);
@@ -75,7 +75,7 @@ async function fetchFullMR(url: string | null) {
     },
     async diff() {
       try {
-        let diffRes = await gitlab.diff(mrRes?.project_id, mrRes?.iid);
+        const diffRes = await gitlab.diff(mrRes?.project_id, mrRes?.iid);
         return diffRes ? adaptGitlabDiff(diffRes) : undefined;
       } catch (err) {
         console.log('gitlab.fetchDiff', err);
@@ -90,7 +90,7 @@ type MRPRomise = ReturnType<typeof fetchFullMR>;
 export type FullMergeRequest = Awaited<MRPRomise>;
 
 class GitlabBrokerService {
-  private pool: Map<string, GitLabService> = new Map();
+  private pool: Map<string, GitlabService> = new Map();
 
   async config(url: string): Promise<InstanceConfig | null> {
     const host = extractHostname(url);
@@ -109,7 +109,7 @@ class GitlabBrokerService {
   }
 
   // Get instance by host url
-  async byUrl(url: string): Promise<GitLabService | null> {
+  async byUrl(url: string): Promise<GitlabService | null> {
     // Check cache first
     const instance = this.poolByHost(extractHostname(url));
 
@@ -128,7 +128,7 @@ class GitlabBrokerService {
   }
 
   // Get instance by id
-  async instance(id: string): Promise<GitLabService | null> {
+  async instance(id: string): Promise<GitlabService | null> {
     // Check cache first
     const instance = this.pool.get(id);
 
@@ -146,7 +146,7 @@ class GitlabBrokerService {
   }
 
   create(config: InstanceConfig) {
-    const instance = new GitLabService({
+    const instance = new GitlabService({
       id: config.id,
       name: config.name,
       apiUrl: config?.hostname || '',
@@ -158,7 +158,7 @@ class GitlabBrokerService {
     return instance;
   }
 
-  private poolByHost(host: string): GitLabService | null {
+  private poolByHost(host: string): GitlabService | null {
     for (const instance of this.pool.values()) {
       if (instance.apiUrl.includes(host)) {
         return instance;

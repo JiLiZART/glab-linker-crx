@@ -1,5 +1,5 @@
 import { extractMRFromUrl } from '../utils/extract-mr-from-url';
-import { GitlabApi } from './gitlabApi';
+import { GitlabApi } from './gitlab-api';
 import type { EnvironmentResponse, MergeRequestResponse } from './types';
 
 type GitlabInstanceConfig = {
@@ -9,7 +9,7 @@ type GitlabInstanceConfig = {
   token: string;
 };
 
-export class GitLabService {
+export class GitlabService {
   private __api?: GitlabApi;
 
   public apiUrl: string;
@@ -34,6 +34,11 @@ export class GitLabService {
 
   apiHostname() {
     return this.api.getApiHostname();
+  }
+
+  async checkTokenAccess() {
+    // @TODO: fetch basic api
+    return this.api.getProjects();
   }
 
   async projects() {

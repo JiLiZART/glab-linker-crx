@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import type { FullMergeRequest } from '../services';
 import { glabBroker } from '../services';
-import { getMRUrl } from '../utils/get-mr-url';
+import { getMRUrl } from '../utils';
 
 export function useMergeRequest() {
   const [actualUrl, setActualUrl] = useState<string | null>(null);
@@ -25,6 +25,10 @@ export function useMergeRequest() {
   const fetch = useCallback(
     async (href: string | null) => {
       const url = getMRUrl(href);
+
+      if (!url) {
+        return null;
+      }
 
       if (await precache(url)) {
         setActualUrl(url);
@@ -65,6 +69,7 @@ export function useMergeRequest() {
     fetch,
     precache,
     refresh,
+    isValidUrl: getMRUrl,
     url: actualUrl,
     data: actualUrl ? dataRef.current.get(actualUrl) : null,
     onMerge: onMerge,

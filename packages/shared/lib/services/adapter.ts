@@ -313,6 +313,7 @@ export function adaptGitlabMR(gitlabMR: MergeRequestResponse) {
     requiredApprovals: 1,
     createdAt: gitlabMR.created_at,
     updatedAt: gitlabMR.updated_at,
+    updatedAtLocale: new Date(gitlabMR.updated_at).toLocaleString(),
     sourceBranch: gitlabMR.source_branch,
     targetBranch: gitlabMR.target_branch,
     url: gitlabMR.web_url,

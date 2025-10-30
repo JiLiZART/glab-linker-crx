@@ -43,7 +43,7 @@ function observeLinks(callback: (href: string) => void) {
   });
 }
 
-export function usePrecacheAll() {
+export function usePrecacheLinks() {
   const { precache } = useMergeRequest();
   const { prefetchLinks } = useSettings();
 

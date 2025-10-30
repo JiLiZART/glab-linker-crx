@@ -1,17 +1,6 @@
 'use client';
 
-import {
-  Skeleton,
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  Button,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/index';
+import { Skeleton, Card, CardContent, CardFooter, CardHeader, Button, TooltipWrapper } from '@/index';
 import { RefreshCcw, Maximize2, X } from 'lucide-react';
 import { forwardRef } from 'react';
 
@@ -19,23 +8,12 @@ interface SkeletonCardProps {
   onClose?: () => void;
 }
 
-function TooltipWrapper({ children, text }: { children: React.ReactNode; text: React.ReactElement }) {
+export const SkeletonCard = forwardRef<HTMLDivElement, SkeletonCardProps>(function SkeletonCard(
+  { onClose, ...props },
+  ref,
+) {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent>{text}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-}
-
-export const SkeletonCard = forwardRef<HTMLDivElement, SkeletonCardProps>(function SkeletonCard({
-  onClose,
-  ...props
-}: SkeletonCardProps) {
-  return (
-    <Card {...props} className="w-full shadow-md">
+    <Card ref={ref} {...props} className="w-full min-w-[600px] shadow-md">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="flex w-full items-center space-x-2">
           <Skeleton className="h-6 w-3/4" />

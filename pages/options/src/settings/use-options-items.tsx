@@ -9,7 +9,9 @@ export const useOptionsItems = () => {
 
   useEffect(() => {
     instancesStorage.items().then(items => setMenuItems(items));
-  }, []);
+  }, [setMenuItems]);
+
+  console.log('useOptionsItems.menuItems', { menuItems });
 
   const add = async () => {
     const newItem = await instancesStorage.add('New Instance');
@@ -33,9 +35,9 @@ export const useOptionsItems = () => {
       hostname: values.hostname,
     });
 
-    const items = await instancesStorage.items()
+    const items = await instancesStorage.items();
 
-    setMenuItems(items)
+    setMenuItems(items);
   };
 
   return {

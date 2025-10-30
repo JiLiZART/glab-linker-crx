@@ -20,7 +20,16 @@ export type InstancesStorage = BaseStorage<InstanceConfig[]> & {
   items: () => Promise<InstanceConfig[]>;
 };
 
-const storage = createStorage<InstanceConfig[]>('glab-linker-items', [], {
+const defaultItems = [
+  {
+    id: 'gitlab.com',
+    name: 'Gitlab.com',
+    token: '',
+    hostname: 'gitlab.com',
+  },
+];
+
+const storage = createStorage<InstanceConfig[]>('glab-linker-items', defaultItems, {
   storageEnum: StorageEnum.Local,
   liveUpdate: true,
   serialization: jsonSerialization,
@@ -41,16 +50,6 @@ export const instancesStorage: InstancesStorage = {
     const items = await storage.get();
 
     if (!items?.length) {
-      const defaultItems = [
-        {
-          name: 'gitlab.com',
-          id: 'gitlab.com',
-          form: {
-            hostname: 'https://gitlab.com',
-          },
-        },
-      ];
-
       await storage.set(defaultItems);
 
       return defaultItems;

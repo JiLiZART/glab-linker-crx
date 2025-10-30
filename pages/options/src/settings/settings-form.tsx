@@ -24,6 +24,8 @@ export const SettingsForm = (props: SettingsFormProps) => {
   const { handleSubmit, formState, control } = methods;
   const { isSubmitting } = formState;
 
+  console.log('SettingsForm.tsx', { defaultValues });
+
   const onSubmit = async (values: SettingsFormValues) => {
     console.log({ values });
 

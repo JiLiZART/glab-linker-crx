@@ -14,7 +14,7 @@ export function AvatarStack({ users, maxVisible = 3, showTooltipNames = false }:
   return (
     <div className="flex items-center">
       <div className="flex -space-x-2">
-        {visibleUsers.map((user, index) => (
+        {visibleUsers.map(user => (
           <TooltipProvider key={user.id}>
             <Tooltip>
               <TooltipTrigger asChild>

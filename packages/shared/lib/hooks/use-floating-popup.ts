@@ -1,4 +1,5 @@
-import { CSSProperties, useState } from 'react';
+import type { CSSProperties } from 'react';
+import { useState } from 'react';
 import {
   autoUpdate,
   flip,
@@ -48,16 +49,12 @@ export function useFloatingPopup(props: PopupProps) {
     middleware: [offset(10), flip(), shift()],
     whileElementsMounted: autoUpdate,
   });
-
+  const positionStyles = position == 'near-cursor' ? floatingStyles : positionMap[position];
   const hover = useHover(context, {});
   const dismiss = useDismiss(context);
   const role = useRole(context);
   // const clientPoint = useClientPoint(context);
   const { getReferenceProps, getFloatingProps } = useInteractions([dismiss, hover, role]);
-
-  console.log('usePopup', { floatingStyles }, getFloatingProps());
-
-  const positionStyles = position == 'near-cursor' ? floatingStyles : positionMap[position];
 
   return {
     isOpen,
@@ -70,6 +67,22 @@ export function useFloatingPopup(props: PopupProps) {
     },
     referenceRef: refs.setReference,
     setPositionRef: refs.setPositionReference,
+    setPoint(clientX: number, clientY: number) {
+      refs.setPositionReference({
+        getBoundingClientRect() {
+          return {
+            width: 0,
+            height: 0,
+            x: clientX,
+            y: clientY,
+            top: clientY,
+            left: clientX,
+            right: clientX,
+            bottom: clientY,
+          };
+        },
+      });
+    },
     popupProps: {
       style: { ...positionStyles, zIndex: 9999, outline: 'none' },
       ...getFloatingProps(),
