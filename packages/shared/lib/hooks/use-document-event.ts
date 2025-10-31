@@ -1,15 +1,22 @@
-import type { DependencyList } from 'react';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 
 export function useDocumentEvent<K extends keyof DocumentEventMap>(
   name: K,
-  action: (this: Document, ev: DocumentEventMap[K]) => void,
-  deps: DependencyList = [],
+  action: (ev: DocumentEventMap[K], signal: AbortSignal) => void,
 ) {
-  const cb = useCallback(action, deps);
-
   useEffect(() => {
-    document.addEventListener(name, cb);
-    return () => document.removeEventListener(name, cb);
-  }, [name, action, cb]);
+    const abortController = new AbortController();
+
+    document.addEventListener(
+      name,
+      e => {
+        return action(e, abortController.signal);
+      },
+      { signal: abortController.signal },
+    );
+
+    return () => {
+      abortController.abort();
+    };
+  }, [name, action]);
 }

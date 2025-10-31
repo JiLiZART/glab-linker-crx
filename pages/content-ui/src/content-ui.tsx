@@ -8,12 +8,14 @@ import {
   useInstances,
 } from '@extension/shared';
 import { MergeRequestCard, FullscreenModal } from '@extension/ui';
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 function useMRCard() {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const clientPos = useRef({ x: 0, y: 0 });
   const settings = useSettings();
   const instances = useInstances();
+  const { position } = settings;
 
   const { fetch, refresh, data, onMerge, onClose: onCloseMR, isValidUrl } = useMergeRequest();
   const {
@@ -25,29 +27,69 @@ function useMRCard() {
     popupProps,
     setPoint,
   } = useFloatingPopup({
-    position: settings.position,
+    position,
   });
 
   usePrecacheLinks();
 
   console.log('ContentUI.render', { instances, settings });
 
-  useDocumentEvent('mouseover', async e => {
+  const showCard = useCallback(
+    async function showCard(url: string, x: number, y: number) {
+      if (x && y) {
+        setPoint(x, y);
+      }
+
+      setIsFullscreen(false);
+      onOpen?.();
+
+      await fetch(url);
+    },
+    [setPoint, setIsFullscreen, onOpen, fetch],
+  );
+
+  async function onMouseMove(e: MouseEvent) {
     const target = e.target as HTMLElement;
+
+    const { clientX, clientY } = e;
+
+    clientPos.current = { x: clientX, y: clientY };
+
+    if (!target) {
+      return;
+    }
+
     const el = target.closest('a');
 
     if (!el || !el?.href || !isValidUrl(el?.href)) {
       return;
     }
 
-    const { clientX, clientY } = e;
+    await showCard(el?.href, clientX, clientY);
+  }
 
-    setPoint(clientX, clientY);
-    setIsFullscreen(false);
-    onOpen?.();
-
-    await fetch(el?.href);
+  useDocumentEvent('mousemove', async e => {
+    await onMouseMove(e);
   });
+
+  const onMessage = useCallback(
+    async function onMessage(message: { type?: string; url?: string }) {
+      if (message?.type === 'glab-linker-open-merge-request' && message.url) {
+        console.log('glab-linker-open-merge-request', message.url);
+
+        await showCard(message.url, clientPos.current.x, clientPos.current.y);
+      }
+    },
+    [showCard],
+  );
+
+  useEffect(() => {
+    chrome.runtime.onMessage.addListener(onMessage);
+
+    return () => {
+      chrome.runtime.onMessage.removeListener(onMessage);
+    };
+  }, [onMessage]);
 
   function onFullscreenClose() {
     setIsFullscreen(false);

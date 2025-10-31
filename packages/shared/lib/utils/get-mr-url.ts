@@ -7,7 +7,5 @@ export function getMRUrl(url?: string | null) {
     return null;
   }
 
-  console.log('getMRUrl', { url });
-
   return url;
 }
