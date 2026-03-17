@@ -4,7 +4,7 @@ import { AddMenuItem } from './sidebar/menu-item-add';
 import { SidebarHeader } from './sidebar/sidebar-header';
 import { GlobalMenuItem } from './sidebar/menu-item-global';
 
-const title = 'Gitlab Linker';
+const title = 'Glab Linker';
 
 export type SidebarProps = {
   activeId?: string;

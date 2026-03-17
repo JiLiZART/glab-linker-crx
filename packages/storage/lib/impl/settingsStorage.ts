@@ -18,6 +18,7 @@ type SettingsTypeKeys = keyof SettingsType;
 
 type SettingsStorage = BaseStorage<SettingsType> & {
   setKeyValue: (name: string, value: unknown) => Promise<void>;
+  setKeyValues: (values: Partial<SettingsType>) => Promise<void>;
   getKeyValue: (name: string) => Promise<unknown>;
 };
 
@@ -27,14 +28,14 @@ const defaultSettings: SettingsType = {
   showAvatar: true,
   showMerge: true,
 
-  position: 'left-top',
+  position: 'near-cursor',
 
   whitelist: '',
   blacklist: '',
 };
 
 const storage = createStorage<SettingsType>('glab-linker-settings', defaultSettings, {
-  storageEnum: StorageEnum.Sync,
+  storageEnum: StorageEnum.Local,
   liveUpdate: true,
 });
 
@@ -47,6 +48,12 @@ export const settingsStorage: SettingsStorage = {
     const key = name as SettingsTypeKeys;
 
     await storage.set({ ...config, [key]: value });
+  },
+
+  setKeyValues: async (values: Partial<SettingsType>) => {
+    const config = await storage.get();
+
+    await storage.set({ ...config, ...values });
   },
 
   getKeyValue: async (name: string) => {

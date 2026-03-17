@@ -12,6 +12,10 @@ export function MergeRequestStatus({ status, mergeBlockers = [] }: MergeRequestS
   let icon = null;
   let label = 'Unknown';
 
+  if (status === null) {
+    return null;
+  }
+
   switch (status) {
     case 'can_merge':
       color = 'bg-green-100 text-green-800';
@@ -32,6 +36,19 @@ export function MergeRequestStatus({ status, mergeBlockers = [] }: MergeRequestS
       color = 'bg-blue-100 text-blue-800';
       label = 'Draft';
       break;
+    case 'closed':
+      color = 'bg-gray-100 text-gray-800';
+      icon = <XCircle className="mr-1 size-3" />;
+      label = 'Closed';
+      break;
+    case 'error':
+      color = 'bg-red-100 text-red-800';
+      icon = <XCircle className="mr-1 size-3" />;
+      label = 'Error';
+      break;
+    default:
+      color = 'bg-gray-100 text-gray-800';
+      label = 'Unknown';
   }
 
   return (

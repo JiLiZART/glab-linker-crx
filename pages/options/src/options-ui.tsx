@@ -33,9 +33,7 @@ const Options = () => {
   const item = items.find(item => item.id === id);
 
   const onSettingsSave: SettingsFormProps['onSave'] = async values => {
-    Object.entries(values).forEach(([key, value]) => {
-      settingsStorage.setKeyValue(key, value);
-    });
+    await settingsStorage.setKeyValues(values);
   };
 
   const onViewItem = (id: string) => {

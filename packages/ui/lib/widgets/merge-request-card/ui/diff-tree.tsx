@@ -123,10 +123,7 @@ export function DiffTree({ changes }: DiffTreeProps) {
         const optimizedFiles = optimizeFileStructure(res.files);
         setProcessedFiles(optimizedFiles);
       })
-      .catch(err => {
-        console.log('diffTree.fetch', err);
-        debugger;
-
+      .catch(() => {
         setData(null);
 
         return null;

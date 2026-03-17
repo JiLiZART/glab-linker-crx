@@ -147,7 +147,7 @@ export type ChangeModel = ReturnType<typeof adaptGitlabDiff>;
 
 export function adaptGitlabMR(gitlabMR: MergeRequestResponse) {
   // Determine merge status
-  let status: 'can_merge' | 'cannot_merge' | 'conflicts' | 'draft' = 'cannot_merge';
+  let status: | 'closed' | 'error' |'can_merge' | 'cannot_merge' | 'conflicts' | 'draft' | null = null;
   const mergeBlockers: string[] = [];
 
   if (gitlabMR.has_conflicts) {
@@ -158,11 +158,17 @@ export function adaptGitlabMR(gitlabMR: MergeRequestResponse) {
       status = 'cannot_merge';
       mergeBlockers.push('Requires approval before merging');
     } else {
-      status = 'can_merge';
+      if (gitlabMR.merged_at === null) {
+        status = 'can_merge';
+      }
     }
   } else if (gitlabMR.draft || gitlabMR.work_in_progress) {
     status = 'draft';
     mergeBlockers.push('Draft merge request cannot be merged');
+  } else if (gitlabMR.merge_error) {
+    status = 'error';
+  } else if (gitlabMR.closed_at) {
+    status = 'closed';
   }
 
   // Check task completion
@@ -177,7 +183,7 @@ export function adaptGitlabMR(gitlabMR: MergeRequestResponse) {
   }
 
   // Map pipeline status
-  let pipelineStatus: 'success' | 'failed' | 'running' | 'pending' | 'canceled' = 'pending';
+  let pipelineStatus: 'success' | 'failed' | 'running' | 'pending' | 'canceled' | null = null;
   if (gitlabMR.head_pipeline) {
     switch (gitlabMR.head_pipeline.status) {
       case 'success':
@@ -202,11 +208,11 @@ export function adaptGitlabMR(gitlabMR: MergeRequestResponse) {
   }
 
   // Create mock reviewers based on labels
-  const mockReviewers = gitlabMR.labels.map((label: string, index: number) => ({
-    id: `reviewer-${index}`,
-    name: `${label} Reviewer`,
-    avatarUrl: '/placeholder.svg?height=40&width=40',
-  }));
+  // const mockReviewers = gitlabMR.labels.map((label: string, index: number) => ({
+  //   id: `reviewer-${index}`,
+  //   name: `${label} Reviewer`,
+  //   avatarUrl: '/placeholder.svg?height=40&width=40',
+  // }));
 
   // Create mock approvers (empty in this case since it's not approved)
   // const mockApprovers = []
@@ -297,8 +303,11 @@ export function adaptGitlabMR(gitlabMR: MergeRequestResponse) {
     projectId: gitlabMR.project_id.toString(),
     title: gitlabMR.title,
     description: gitlabMR.description,
-    status,
-    canMerge: status === 'can_merge',
+    mergeStatus: status,
+    canMerge: status === 'can_merge' && gitlabMR.merged_at === null,
+    mergedAt: gitlabMR.merged_at,
+    closedAt: gitlabMR.closed_at,
+
     mergeBlockers,
     pipelineStatus,
     author: {
@@ -306,11 +315,16 @@ export function adaptGitlabMR(gitlabMR: MergeRequestResponse) {
       name: gitlabMR.author.name,
       avatarUrl: gitlabMR.author.avatar_url,
     },
-    reviewers: [],
+    reviewers: gitlabMR.reviewers.map(item => ({
+      id: item.id.toString(),
+      name: item.name || item.username,
+      avatarUrl: item.avatar_url,
+    })),
     approvers: [],
     // reviewers: mockReviewers,
     // approvers: mockApprovers,
-    requiredApprovals: 1,
+    requiredApprovals: null,
+    changesCount: gitlabMR.changes_count,
     createdAt: gitlabMR.created_at,
     updatedAt: gitlabMR.updated_at,
     updatedAtLocale: new Date(gitlabMR.updated_at).toLocaleString(),

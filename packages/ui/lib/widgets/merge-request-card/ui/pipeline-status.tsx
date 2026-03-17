@@ -11,6 +11,10 @@ export function PipelineStatus({ status }: PipelineStatusProps) {
   let icon = null;
   let label = 'Unknown';
 
+  if (status === null) {
+    return null;
+  }
+
   switch (status) {
     case 'success':
       color = 'bg-green-100 text-green-800';

@@ -1,8 +1,18 @@
 'use client';
 
-import type { HTMLAttributes } from 'react';
-import { forwardRef, useState } from 'react';
-import { RefreshCcw, Maximize2, GitMerge, XCircle, X, CheckCircle } from 'lucide-react';
+import type { HTMLAttributes} from 'react';
+import { useRef , forwardRef, useState } from 'react';
+import {
+  RefreshCcw,
+  Maximize2,
+  GitMerge,
+  XCircle,
+  X,
+  CheckCircle,
+  ExternalLink,
+  CircleX,
+  GitCommitIcon,
+} from 'lucide-react';
 import {
   Avatar,
   AvatarFallback,
@@ -97,9 +107,12 @@ export const MergeRequestCard = forwardRef<HTMLDivElement, MergeRequestCardProps
       onMRMerge,
       onMRClose,
     } = props;
+    const { showAvatar = true, showMerge = true, showDescription = true } = settings || {};
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [cardPosition, setCardPosition] = useState({ top: 0, left: 0, width: 0, height: 0 });
     const [isAnimating, setIsAnimating] = useState(false);
+    const cardRef = useRef<HTMLDivElement>(null);
+    const canClose = false
 
     const handleRefresh = async () => {
       if (item?.url && onMRRefresh) {
@@ -111,9 +124,11 @@ export const MergeRequestCard = forwardRef<HTMLDivElement, MergeRequestCardProps
 
     const handleFullscreenClick = () => {
       // Get the current card position for animation
-      const cardElement = document.getElementById('mr-card');
+      const cardElement = cardRef?.current;
+
       if (cardElement) {
         const rect = cardElement.getBoundingClientRect();
+
         setCardPosition({
           top: rect.top,
           left: rect.left,
@@ -153,7 +168,7 @@ export const MergeRequestCard = forwardRef<HTMLDivElement, MergeRequestCardProps
       </TooltipWrapper>
     );
 
-    const mergeButton = (
+    const mergeButton = onMRMerge && (
       <Button
         variant="default"
         size="sm"
@@ -165,7 +180,7 @@ export const MergeRequestCard = forwardRef<HTMLDivElement, MergeRequestCardProps
       </Button>
     );
 
-    const approveButton = (
+    const approveButton = onMRApprove && (
       <Button
         variant="default"
         size="sm"
@@ -176,7 +191,7 @@ export const MergeRequestCard = forwardRef<HTMLDivElement, MergeRequestCardProps
       </Button>
     );
 
-    const closeMrButton = (
+    const closeMrButton = onMRClose && (
       <Button
         variant="outline"
         size="sm"
@@ -190,7 +205,7 @@ export const MergeRequestCard = forwardRef<HTMLDivElement, MergeRequestCardProps
     return (
       <>
         <CardSpotlight
-          ref={ref}
+          ref={cardRef}
           {...rootProps}
           id="mr-card"
           className="relative w-full min-w-[600px] max-w-2xl shadow-md transition-all duration-300 hover:shadow-lg">
@@ -204,28 +219,28 @@ export const MergeRequestCard = forwardRef<HTMLDivElement, MergeRequestCardProps
           <CardHeader className="space-y-4">
             <div className="flex flex-col items-start gap-4">
               <div className="flex items-center gap-2">
-                <AuthorAvatar item={item} />
+                {showAvatar && <AuthorAvatar item={item} />}
                 <div className="flex flex-col items-start gap-1">
                   <h2 className="font-semibold leading-none">{item.title}</h2>
                   <div className="flex items-center gap-2">
                     <div className="text-muted-foreground text-sm">by {item.author.name}</div>
                     <a href={item.url} target="_blank" rel="noreferrer noopener">
                       <Badge variant="outline" className="ml-2">
-                        !{item.id}
+                        !{item.id} <ExternalLink className="inline ml-2 size-3" />
                       </Badge>
                     </a>
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <MergeRequestStatus status={item.status} mergeBlockers={item.mergeBlockers} />
+                <MergeRequestStatus status={item.mergeStatus} mergeBlockers={item.mergeBlockers} />
                 <PipelineStatus status={item.pipelineStatus} />
               </div>
             </div>
           </CardHeader>
 
           <CardContent className="pt-0">
-            {item.description && (
+            {showDescription && item.description && (
               <div className="mb-4 max-h-32 overflow-y-auto rounded-md border bg-gray-50 p-3">
                 <MarkdownRenderer content={item.description} />
               </div>
@@ -236,26 +251,49 @@ export const MergeRequestCard = forwardRef<HTMLDivElement, MergeRequestCardProps
               {/*<MergeRequestStats changesCount={mr.ca} hasConflicts={} createdAt={updatedAt} />*/}
             </div>
 
-            <div className="flex flex-row gap-4">
-              <div className="mb-1 text-sm text-gray-500">
-                <AvatarStack users={item.reviewers} maxVisible={3} />
-                Reviewers ({item.reviewers.length})
-              </div>
-              <div className="mb-1 text-sm text-gray-500">
-                <AvatarStack users={item.approvers} maxVisible={3} showTooltipNames={true} />
-                Approvals ({item.approvers.length}/{item.requiredApprovals})
-              </div>
+            <div className="flex flex-row gap-4 mt-2">
+              {item.reviewers.length > 0 && (
+                <div className="flex flex-row gap-2 mb-1 text-sm text-gray-500">
+                  <AvatarStack users={item.reviewers} maxVisible={3} />
+                  Reviewers ({item.reviewers.length})
+                </div>
+              )}
+              {item.approvers.length > 0 && (
+                <div className="flex flex-row gap-2 mb-1 text-sm text-gray-500">
+                  <AvatarStack users={item.approvers} maxVisible={3} showTooltipNames={true} />
+                  Approvals ({item.approvers.length}/{item.requiredApprovals})
+                </div>
+              )}
             </div>
           </CardContent>
 
           <CardFooter className="flex justify-between border-t pt-2">
             <div className="flex space-x-2">
-              {mergeButton}
+              {item.mergedAt && (
+                <Button variant="default" size="sm" className="bg-blue-600" disabled>
+                  <GitMerge className="mr-1 size-4" />
+                  Merged
+                </Button>
+              )}
+              {item.closedAt && (
+                <Button variant="default" size="sm" className="bg-red-600" disabled>
+                  <CircleX className="mr-1 size-4" />
+                  Closed
+                </Button>
+              )}
+              {showMerge && mergeButton}
               {approveButton}
-              {closeMrButton}
+              {canClose && closeMrButton}
             </div>
 
-            <div className="text-xs text-gray-500">Updated {item.updatedAtLocale}</div>
+            <div className="flex flex-row items-center gap-4">
+              <div className="text-xs text-gray-500">Updated {item.updatedAtLocale}</div>
+
+              <div className="flex items-center gap-1.5">
+                <GitCommitIcon className="size-3 color-gray-500" />
+                <span className="text-xs text-gray-500">{item.changesCount} changes</span>
+              </div>
+            </div>
           </CardFooter>
         </CardSpotlight>
 

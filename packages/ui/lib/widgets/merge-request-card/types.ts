@@ -4,8 +4,8 @@ export interface User {
   avatarUrl: string;
 }
 
-export type MergeRequestStatusType = 'can_merge' | 'cannot_merge' | 'conflicts' | 'draft';
-export type PipelineStatusType = 'success' | 'failed' | 'running' | 'pending' | 'canceled';
+export type MergeRequestStatusType = 'can_merge' | 'cannot_merge' | 'conflicts' | 'draft' | 'error' | 'closed' | null;
+export type PipelineStatusType = 'success' | 'failed' | 'running' | 'pending' | 'canceled' | null;
 
 export interface Commit {
   id: string;

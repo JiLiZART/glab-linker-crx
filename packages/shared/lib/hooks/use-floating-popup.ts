@@ -4,7 +4,7 @@ import {
   autoUpdate,
   flip,
   offset,
-  shift,
+  shift, useClientPoint,
   useDismiss,
   useFloating,
   useHover,
@@ -49,7 +49,7 @@ export function useFloatingPopup(props: PopupProps) {
     middleware: [offset(10), flip(), shift()],
     whileElementsMounted: autoUpdate,
   });
-  const positionStyles = position == 'near-cursor' ? floatingStyles : positionMap[position];
+  const positionStyles = position === 'near-cursor' ? floatingStyles : positionMap[position];
   const hover = useHover(context, {});
   const dismiss = useDismiss(context);
   const role = useRole(context);
@@ -68,6 +68,7 @@ export function useFloatingPopup(props: PopupProps) {
     referenceRef: refs.setReference,
     setPositionRef: refs.setPositionReference,
     setPoint(clientX: number, clientY: number) {
+      console.log('setPoint', clientX, clientY);
       refs.setPositionReference({
         getBoundingClientRect() {
           return {
@@ -84,8 +85,8 @@ export function useFloatingPopup(props: PopupProps) {
       });
     },
     popupProps: {
-      style: { ...positionStyles, zIndex: 9999, outline: 'none' },
       ...getFloatingProps(),
+      style: { ...positionStyles, zIndex: 9999, outline: 'none' },
     } as const,
   };
 }

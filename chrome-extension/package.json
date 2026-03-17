@@ -1,7 +1,7 @@
 {
   "name": "glab-linker-crx",
   "version": "1.0.3",
-  "description": "Show preview of GitLab merge requests",
+  "description": "Show preview of Glab merge requests",
   "type": "module",
   "scripts": {
     "clean:node_modules": "pnpx rimraf node_modules",

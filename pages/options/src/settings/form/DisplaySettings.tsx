@@ -4,53 +4,53 @@ import { useFormValues } from '@src/util';
 import { Controller } from 'react-hook-form';
 
 const mergePreviewData = {
-  // title: 'MR title',
-  // description: 'MR Description',
-  // author: {
-  //   name: 'John Doe',
-  //   avatar: 'Avatar url',
-  // },
-  // sourceBranch: 'foo-long-branch-name',
-  // targetBranch: 'releases/main',
-  // updatedAt: new Date().toISOString(),
-  // changesCount: 9999,
-  // hasConflicts: true,
-  // status: 'opened', // 'opened' | 'merged' | 'closed' | string;
-  // isDraft: true,
-  // isInProgress: true,
-  // pipeline: {
-  //   status: 'running', // 'running' | 'success' | 'failed' | 'pending' | string;
-  // },
-  // approvals: {
-  //   approvers: [{ name: 'Foo Bar', avatar: '#' }],
-  //   required: 2,
-  // },
-  // reviewers: [
-  //   { name: 'Reviewer 1', avatar: '#' },
-  //   { name: 'Reviewer 2', avatar: '#' },
-  // ],
-  // canMerge: true,
-  // youCanMerge: true,
-  // mergeBlockers: ['Merge Blocker 1', 'Merge Blocker 2'],
-  // reviewApp: {
-  //   url: '#',
-  //   slug: 'review-app-slug-XXX-999-111',
-  //   state: 'available',
-  // },
-  // onMerge: () =>
-  //   new Promise(resolve => {
-  //     setTimeout(() => {
-  //       resolve(undefined);
-  //       alert('Merged');
-  //     }, 3000);
-  //   }),
-  // onClose: () =>
-  //   new Promise(resolve => {
-  //     setTimeout(() => {
-  //       resolve(undefined);
-  //       alert('Closed!');
-  //     }, 3000);
-  //   }),
+  title: 'MR title',
+  description: 'MR Description',
+  author: {
+    name: 'John Doe',
+    avatar: 'Avatar url',
+  },
+  sourceBranch: 'foo-long-branch-name',
+  targetBranch: 'releases/main',
+  updatedAt: new Date().toISOString(),
+  changesCount: 9999,
+  hasConflicts: true,
+  status: 'opened', // 'opened' | 'merged' | 'closed' | string;
+  isDraft: true,
+  isInProgress: true,
+  pipeline: {
+    status: 'running', // 'running' | 'success' | 'failed' | 'pending' | string;
+  },
+  approvals: {
+    approvers: [{ name: 'Foo Bar', avatar: '#' }],
+    required: 2,
+  },
+  reviewers: [
+    { name: 'Reviewer 1', avatar: '#' },
+    { name: 'Reviewer 2', avatar: '#' },
+  ],
+  canMerge: true,
+  youCanMerge: true,
+  mergeBlockers: ['Merge Blocker 1', 'Merge Blocker 2'],
+  reviewApp: () => Promise.resolve({
+    url: '#',
+    slug: 'review-app-slug-XXX-999-111',
+    state: 'available',
+  }),
+  onMerge: () =>
+    new Promise(resolve => {
+      setTimeout(() => {
+        resolve(undefined);
+        alert('Merged');
+      }, 3000);
+    }),
+  onClose: () =>
+    new Promise(resolve => {
+      setTimeout(() => {
+        resolve(undefined);
+        alert('Closed!');
+      }, 3000);
+    }),
 };
 
 function MergeRequestPreview() {
@@ -62,9 +62,11 @@ function MergeRequestPreview() {
       <div className="bg-gray-50 p-4">
         <MergeRequestCard
           {...mergePreviewData}
-          showAvatar={values.showAvatar}
-          showMerge={values.showMerge}
-          showDescription={values.showDescription}
+          settings={{
+            showAvatar: values.showAvatar,
+            showMerge: values.showMerge,
+            showDescription: values.showDescription,
+          }}
         />
       </div>
     </div>

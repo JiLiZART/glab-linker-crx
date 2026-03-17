@@ -51,10 +51,11 @@ interface FullscreenModalProps {
   onMRMerge?: (url: string) => Promise<void>;
   onMRClose?: (url: string) => Promise<void>;
   onClose?: () => void;
+  onExitFullscreen?: () => void;
 }
 
 export function FullscreenModal(props: FullscreenModalProps) {
-  const { mr, diff, commits, pipelines, reviewApp, onClose, onMRRefresh, onMRApprove, onMRMerge, onMRClose } = props;
+  const { mr, diff, commits, pipelines, reviewApp, onExitFullscreen, onClose, onMRRefresh, onMRApprove, onMRMerge, onMRClose } = props;
   const [activeTab, setActiveTab] = useState('overview');
   const [squashCommits, setSquashCommits] = useState(true);
   const [deleteSourceBranch, setDeleteSourceBranch] = useState(false);
@@ -100,6 +101,10 @@ export function FullscreenModal(props: FullscreenModalProps) {
       onClose?.();
     }, 300); // Match this with the CSS transition duration
   };
+
+  const handleExitFullscreen = () => {
+    onExitFullscreen?.();
+  }
 
   const loadingState = (
     <div className="flex-1 space-y-6 p-6">
@@ -161,7 +166,7 @@ export function FullscreenModal(props: FullscreenModalProps) {
               <ExternalLink className="size-4" />
             </Button>
 
-            <Button variant="ghost" size="icon" onClick={handleCloseWithAnimation}>
+            <Button variant="ghost" size="icon" onClick={handleExitFullscreen}>
               <Minimize2 className="size-4" />
             </Button>
 

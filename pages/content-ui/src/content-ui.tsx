@@ -32,7 +32,7 @@ function useMRCard() {
 
   usePrecacheLinks();
 
-  console.log('ContentUI.render', { instances, settings });
+  console.log('ContentUI.render', { position, instances, settings });
 
   const showCard = useCallback(
     async function showCard(url: string, x: number, y: number) {
@@ -106,7 +106,7 @@ function useMRCard() {
     pipelines: data?.pipelines,
     commits: data?.commits,
     reviewApp: data?.reviewApp,
-    onMrMerge: onMerge,
+    onMrMerge: data?.data.canMerge ? onMerge : undefined,
     onMrClose: onCloseMR,
     onMrRefresh: refresh,
     onFullscreenClose,
@@ -152,7 +152,8 @@ export default function ContentUI() {
         onMRMerge={onMrMerge}
         onMRClose={onMrClose}
         onMRRefresh={onMrRefresh}
-        onClose={onFullscreenClose}
+        onExitFullscreen={onFullscreenClose}
+        onClose={onPopupClose}
       />
     );
   }

@@ -20,7 +20,16 @@ export interface MergeRequestResponse {
   author: Author;
   assignees: string[];
   assignee: string;
-  reviewers: string[];
+  reviewers: Array<{
+    "id": number,
+    "username": string,
+    "public_email": string,
+    "name": string,
+    "state": "active" | string,
+    "locked": boolean,
+    "avatar_url": string,
+    "web_url": string
+  }>;
   source_project_id: number;
   target_project_id: number;
   labels: string[];
