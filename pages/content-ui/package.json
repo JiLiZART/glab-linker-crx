@@ -26,7 +26,6 @@
     "lucide-react": "0.469.0",
     "date-fns": "4.1.0",
     "@extension/shared": "workspace:*",
-    "@extension/storage": "workspace:*",
     "@extension/ui": "workspace:*"
   },
   "devDependencies": {

@@ -1,0 +1,341 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import {
+  Card,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Button,
+  Badge,
+  Checkbox,
+  Skeleton,
+  AvatarImage,
+  AvatarFallback,
+  Avatar,
+} from '@/index';
+import {
+  RefreshCcw,
+  Minimize2,
+  X,
+  GitMerge,
+  XCircle,
+  GitCommit,
+  GitPullRequest,
+  PenLineIcon as PipelineLine,
+  FileCode,
+  CheckCircle,
+  ExternalLink,
+} from 'lucide-react';
+import { MarkdownRenderer } from './markdown-renderer';
+import { MergeRequestStatus } from './merge-request-status';
+import { PipelineStatus } from './pipeline-status';
+import { AvatarStack } from './avatar-stack';
+import { CommitList } from './commit-list';
+import { PipelineList } from './pipeline-list';
+import { DiffTree } from './diff-tree';
+import { BranchInfo } from './branch-info';
+import { ReviewAppButton } from './review-app-button';
+
+import type { ChangeModel, CommitModel, MergeRequestModel, PipelineModel, ReviewAppModel } from '@extension/shared';
+
+interface FullscreenModalProps {
+  mr?: MergeRequestModel;
+  diff?: () => Promise<ChangeModel | undefined>;
+  commits?: () => Promise<CommitModel | undefined>;
+  pipelines?: () => Promise<PipelineModel | undefined>;
+  reviewApp?: () => Promise<ReviewAppModel | undefined>;
+  onMRRefresh?: (url: string) => Promise<void>;
+  onMRApprove?: (url: string) => Promise<void>;
+  onMRMerge?: (url: string) => Promise<void>;
+  onMRClose?: (url: string) => Promise<void>;
+  onClose?: () => void;
+  onExitFullscreen?: () => void;
+}
+
+export function FullscreenModal(props: FullscreenModalProps) {
+  const { mr, diff, commits, pipelines, reviewApp, onExitFullscreen, onClose, onMRRefresh, onMRApprove, onMRMerge, onMRClose } = props;
+  const [activeTab, setActiveTab] = useState('overview');
+  const [squashCommits, setSquashCommits] = useState(true);
+  const [deleteSourceBranch, setDeleteSourceBranch] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [animateIn, setAnimateIn] = useState(false);
+
+  useEffect(() => {
+    // Trigger animation after component mounts
+    requestAnimationFrame(() => {
+      setAnimateIn(true);
+    });
+  }, []);
+
+  const handleMerge = async () => {
+    if (mr?.url) {
+      await onMRMerge?.(mr.url);
+    }
+  };
+
+  const handleApprove = async () => {
+    if (mr?.url) {
+      await onMRApprove?.(mr.url);
+    }
+  };
+
+  const handleClose = async () => {
+    if (mr?.url) {
+      await onMRClose?.(mr.url);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setIsLoading(true);
+    if (mr?.url) {
+      await onMRRefresh?.(mr?.url);
+    }
+    setIsLoading(false);
+  };
+
+  const handleCloseWithAnimation = () => {
+    setAnimateIn(false);
+    setTimeout(() => {
+      onClose?.();
+    }, 300); // Match this with the CSS transition duration
+  };
+
+  const handleExitFullscreen = () => {
+    onExitFullscreen?.();
+  }
+
+  const loadingState = (
+    <div className="flex-1 space-y-6 p-6">
+      <div className="grid grid-cols-3 gap-6">
+        <div className="col-span-2 space-y-6">
+          <div>
+            <Skeleton className="mb-2 h-6 w-40" />
+            <Skeleton className="h-64 w-full rounded-md" />
+          </div>
+          <div>
+            <Skeleton className="mb-2 h-6 w-40" />
+            <Skeleton className="h-40 w-full rounded-md" />
+          </div>
+        </div>
+        <div className="space-y-6">
+          <div>
+            <Skeleton className="mb-2 h-6 w-24" />
+            <Skeleton className="h-80 w-full rounded-md" />
+          </div>
+          <Skeleton className="h-10 w-full rounded-md" />
+        </div>
+      </div>
+    </div>
+  );
+
+  if (!mr) {
+    return loadingState;
+  }
+
+  const cn = `absolute inset-0 z-50 h-[90vh] w-full max-w-6xl mx-auto my-4 p-0 overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 ${
+    animateIn ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+  }`;
+
+  return (
+    <Card id="mr-card" className={cn} style={{ zIndex: 999999 }}>
+      <div className="flex h-full flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b p-4">
+          <div className="flex flex-col items-start gap-1">
+            <div className="flex items-center">
+              <h2 className="mr-2 text-xl font-semibold">{mr.title}</h2>
+              <a href={mr.url} target="_blank" rel="noreferrer noopener">
+                <Badge variant="outline">!{mr.id}</Badge>
+              </a>
+            </div>
+            <BranchInfo sourceBranch={mr.sourceBranch} targetBranch={mr.targetBranch} />
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Button variant="ghost" size="icon" onClick={handleRefresh} disabled={isLoading}>
+              <RefreshCcw className={`size-4 ${isLoading ? 'animate-spin' : ''}`} />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => window.open(mr.url || `https://gitlab.com/merge_requests/${mr.id}`, '_blank')}
+              title="Open in GitLab">
+              <ExternalLink className="size-4" />
+            </Button>
+
+            <Button variant="ghost" size="icon" onClick={handleExitFullscreen}>
+              <Minimize2 className="size-4" />
+            </Button>
+
+            <Button variant="ghost" size="icon" onClick={handleCloseWithAnimation}>
+              <X className="size-4" />
+            </Button>
+          </div>
+        </div>
+
+        {isLoading ? (
+          loadingState
+        ) : (
+          <Tabs
+            defaultValue="overview"
+            className="flex flex-1 flex-col overflow-hidden"
+            value={activeTab}
+            onValueChange={setActiveTab}>
+            <div className="border-b">
+              <TabsList className="h-12 px-4">
+                <TabsTrigger value="overview" className="flex items-center">
+                  <GitPullRequest className="mr-2 size-4" />
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger value="commits" className="flex items-center">
+                  <GitCommit className="mr-2 size-4" />
+                  Commits
+                </TabsTrigger>
+                <TabsTrigger value="pipelines" className="flex items-center">
+                  <PipelineLine className="mr-2 size-4" />
+                  Pipelines
+                </TabsTrigger>
+                <TabsTrigger value="changes" className="flex items-center">
+                  <FileCode className="mr-2 size-4" />
+                  Changes
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <div className="flex-1 overflow-auto">
+              <TabsContent value="overview" className="h-full p-4">
+                <div className="grid h-full grid-cols-3 gap-6">
+                  <div className="col-span-2 space-y-6">
+                    <div>
+                      <h3 className="mb-2 text-lg font-medium">Description</h3>
+                      <div className="rounded-md border bg-gray-50 p-4">
+                        <MarkdownRenderer content={mr.description} />
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="mb-2 text-lg font-medium">Merge options</h3>
+                      <div className="space-y-3 rounded-md border p-4">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="squash-commits"
+                            checked={squashCommits}
+                            onCheckedChange={checked => setSquashCommits(checked as boolean)}
+                          />
+                          <label
+                            htmlFor="squash-commits"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                            Squash commits when merge request is accepted
+                          </label>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="delete-source-branch"
+                            checked={deleteSourceBranch}
+                            onCheckedChange={checked => setDeleteSourceBranch(checked as boolean)}
+                          />
+                          <label
+                            htmlFor="delete-source-branch"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                            Delete source branch when merge request is accepted
+                          </label>
+                        </div>
+
+                        <div className="flex space-x-2 pt-3">
+                          <Button
+                            variant="default"
+                            className="bg-green-600 hover:bg-green-700"
+                            onClick={handleMerge}
+                            disabled={!mr.canMerge}>
+                            <GitMerge className="mr-1 size-4" />
+                            Merge
+                          </Button>
+                          <Button variant="default" className="bg-blue-600 hover:bg-blue-700" onClick={handleApprove}>
+                            <CheckCircle className="mr-1 size-4" />
+                            Approve
+                          </Button>
+                          <Button variant="outline" className="text-red-600 hover:text-red-700" onClick={handleClose}>
+                            <XCircle className="mr-1 size-4" />
+                            Close
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="mb-2 text-lg font-medium">Details</h3>
+                      <div className="space-y-4 rounded-md border p-4">
+                        <div>
+                          <p className="mb-1 text-sm text-gray-500">Status</p>
+                          <div className="flex space-x-2">
+                            <MergeRequestStatus status={mr.status} mergeBlockers={mr.mergeBlockers} />
+                            <PipelineStatus status={mr.pipelineStatus} />
+                          </div>
+                        </div>
+
+                        <div>
+                          <p className="mb-1 text-sm text-gray-500">Author</p>
+                          <div className="flex items-center">
+                            <Avatar className="border-background mr-1 size-4 rounded-full border-2">
+                              <AvatarImage src={mr.author.avatarUrl} alt={mr.author.name} />
+                              <AvatarFallback>{mr.author.name[0]}</AvatarFallback>
+                            </Avatar>
+                            <span className="text-sm font-medium">{mr.author.name}</span>
+                          </div>
+                        </div>
+
+                        <div>
+                          <p className="mb-1 text-sm text-gray-500">Reviewers ({mr.reviewers.length})</p>
+                          <AvatarStack users={mr.reviewers} maxVisible={5} showTooltipNames={true} />
+                        </div>
+
+                        <div>
+                          <p className="mb-1 text-sm text-gray-500">
+                            Approvals ({mr.approvers.length}/{mr.requiredApprovals})
+                          </p>
+                          <AvatarStack users={mr.approvers} maxVisible={5} showTooltipNames={true} />
+                        </div>
+
+                        <div>
+                          <p className="mb-1 text-sm text-gray-500">Created</p>
+                          <p className="text-sm">{new Date(mr.createdAt).toLocaleString()}</p>
+                        </div>
+
+                        <div>
+                          <p className="mb-1 text-sm text-gray-500">Updated</p>
+                          <p className="text-sm">{new Date(mr.updatedAt).toLocaleString()}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <ReviewAppButton reviewApp={reviewApp} />
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="commits" className="p-4">
+                <CommitList commits={commits} />
+              </TabsContent>
+
+              <TabsContent value="pipelines" className="p-4">
+                <PipelineList pipelines={pipelines} />
+              </TabsContent>
+
+              <TabsContent value="changes" className="p-4">
+                <DiffTree changes={diff} />
+              </TabsContent>
+            </div>
+          </Tabs>
+        )}
+      </div>
+    </Card>
+  );
+}

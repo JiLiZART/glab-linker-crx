@@ -29,7 +29,7 @@ const manifest = deepmerge(
     description: '__MSG_extensionDescription__',
     host_permissions: ['<all_urls>'],
     // permissions: ['storage', 'scripting', 'tabs', 'notifications'],
-    permissions: ['storage', 'activeTab'],
+    permissions: ['storage', 'activeTab', 'contextMenus'],
     options_page: 'options/index.html',
     background: {
       service_worker: 'background.iife.js',

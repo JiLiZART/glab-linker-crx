@@ -1,14 +1,16 @@
 import { createRoot } from 'react-dom/client';
-import '@src/index.css';
 import '@extension/ui/global.css';
-import Options from '@src/Options';
+import Options from './options-ui';
 
 function init() {
-  const appContainer = document.querySelector('#app-container');
+  const appContainer = document.querySelector('#shadow-root-crx-gitlab-linker-root');
+
   if (!appContainer) {
-    throw new Error('Can not find #app-container');
+    throw new Error('Can not find #shadow-root');
   }
+
   const root = createRoot(appContainer);
+
   root.render(<Options />);
 }
 

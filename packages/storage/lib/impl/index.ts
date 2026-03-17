@@ -1,3 +1,3 @@
 export * from './exampleThemeStorage';
-export * from './gitlabTokenStorage';
-export * from './gitlabApiUrlStorage';
+export * from './instancesStorage';
+export * from './settingsStorage';

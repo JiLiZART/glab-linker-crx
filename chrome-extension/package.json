@@ -1,7 +1,7 @@
 {
   "name": "glab-linker-crx",
   "version": "1.0.3",
-  "description": "Show preview of GitLab merge requests",
+  "description": "Show preview of Glab merge requests",
   "type": "module",
   "scripts": {
     "clean:node_modules": "pnpx rimraf node_modules",
@@ -25,7 +25,7 @@
     "@extension/hmr": "workspace:*",
     "@extension/tsconfig": "workspace:*",
     "@extension/vite-config": "workspace:*",
-    "@laynezh/vite-plugin-lib-assets": "^1.0.0",
+    "@laynezh/vite-plugin-lib-assets": "0.6.1",
     "@types/ws": "^8.5.12",
     "magic-string": "^0.30.10",
     "ts-loader": "^9.5.1",
