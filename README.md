@@ -2,7 +2,7 @@
     <img src="https://github.com/JiLiZART/glab-linker-crx/blob/main/chrome-extension/public/icon-128.png?raw=true" alt="Gitlab Linker Logo" style="width: 150px;">
 </div>
 
-<h1 style="text-align: center;">Gitlab Linker</h1>
+<h1 style="text-align: center;">Glab Linker</h1>
 <p style="text-align: center;"><strong>A simple tool for quick actions on GitLab Merge Requests.</strong></p>
 
 <h2>Motivation</h2>
