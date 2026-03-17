@@ -53,13 +53,13 @@ export const SpotlightCard = ({
       onMouseLeave={handleMouseLeave}
       className={`relative overflow-hidden ${className}`}>
       <div
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 ease-in-out z-10"
+        className="pointer-events-none absolute inset-0 z-10 opacity-0 transition-opacity duration-500 ease-in-out"
         style={{
           opacity,
           background: `radial-gradient(circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 80%)`,
         }}
       />
-      <div className="z-50 relative">{children}</div>
+      <div className="relative z-50">{children}</div>
     </div>
   );
 };

@@ -27,9 +27,7 @@ async function fetchFullMR(url: string | null) {
     return;
   }
 
-  const mrRes = await gitlab.mr(url).catch(err => {
-    console.log('gitlab.fetchMR', err);
-    debugger;
+  const mrRes = await gitlab.mr(url).catch(() => {
     return null;
   });
 
@@ -39,17 +37,13 @@ async function fetchFullMR(url: string | null) {
 
   const data = adaptGitlabMR(mrRes);
 
-  console.log('mr', data);
-
   return {
     data: data,
     async reviewApp() {
       try {
         const envRes = await gitlab.reviewApp(mrRes?.pipeline?.project_id, mrRes?.pipeline?.ref);
         return envRes ? adaptGitlabReviewApp(envRes) : undefined;
-      } catch (err) {
-        console.log('gitlab.fetchReviewApp', err);
-        debugger;
+      } catch {
         return undefined;
       }
     },
@@ -57,9 +51,7 @@ async function fetchFullMR(url: string | null) {
       try {
         const commitsRes = await gitlab.commits(mrRes?.project_id, mrRes?.iid);
         return commitsRes ? adaptGitlabCommits(commitsRes) : undefined;
-      } catch (err) {
-        console.log('gitlab.fetchCommits', err);
-        debugger;
+      } catch {
         return undefined;
       }
     },
@@ -67,9 +59,7 @@ async function fetchFullMR(url: string | null) {
       try {
         const pipelinesRes = await gitlab.pipelines(mrRes?.project_id, mrRes?.iid);
         return pipelinesRes ? adaptGitlabPipelines(pipelinesRes) : undefined;
-      } catch (err) {
-        console.log('gitlab.fetchPipelines', err);
-        debugger;
+      } catch {
         return undefined;
       }
     },
@@ -77,9 +67,7 @@ async function fetchFullMR(url: string | null) {
       try {
         const diffRes = await gitlab.diff(mrRes?.project_id, mrRes?.iid);
         return diffRes ? adaptGitlabDiff(diffRes) : undefined;
-      } catch (err) {
-        console.log('gitlab.fetchDiff', err);
-        debugger;
+      } catch {
         return undefined;
       }
     },

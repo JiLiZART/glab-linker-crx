@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, Skeleton, Badge } from '@/index';
+import { Skeleton, Badge } from '@/index';
 import { ChevronRight, ChevronDown, FileText, FolderOpen, Folder, Plus, Minus, FileCode } from 'lucide-react';
-import type { FileChange } from '../types';
 import { DiffViewer } from './diff-viewer';
+import type { FileChange } from '../types';
 import type { ChangeModel } from '@extension/shared';
 
 interface DiffTreeProps {
@@ -12,50 +12,50 @@ interface DiffTreeProps {
 }
 
 // Function to optimize file structure by collapsing single-item folders
-const optimizeFileStructure = (files: ChangeModel['files']) => {
-  // Create a map of all paths and their parent paths
-  const pathMap = new Map<string, string[]>();
-
-  files.forEach(file => {
-    const parts = file.path.split('/');
-    let currentPath = '';
-
-    for (let i = 0; i < parts.length - 1; i++) {
-      const parentPath = currentPath;
-      currentPath = currentPath ? `${currentPath}/${parts[i]}` : parts[i];
-
-      if (!pathMap.has(currentPath)) {
-        pathMap.set(currentPath, []);
-      }
-
-      if (parentPath) {
-        const children = pathMap.get(parentPath) || [];
-        if (!children.includes(currentPath)) {
-          children.push(currentPath);
-          pathMap.set(parentPath, children);
-        }
-      }
-    }
-
-    // Add the file to its parent folder
-    const parentPath = parts.slice(0, parts.length - 1).join('/');
-    if (parentPath) {
-      const children = pathMap.get(parentPath) || [];
-      if (!children.includes(file.path)) {
-        children.push(file.path);
-        pathMap.set(parentPath, children);
-      }
-    }
-  });
-
-  // Return the original files - the optimization will happen in the TreeFolder component
-  return files;
-};
+// const optimizeFileStructure = (files: ChangeModel['files']) => {
+//   // Create a map of all paths and their parent paths
+//   const pathMap = new Map<string, string[]>();
+//
+//   files.forEach(file => {
+//     const parts = file.path.split('/');
+//     let currentPath = '';
+//
+//     for (let i = 0; i < parts.length - 1; i++) {
+//       const parentPath = currentPath;
+//       currentPath = currentPath ? `${currentPath}/${parts[i]}` : parts[i];
+//
+//       if (!pathMap.has(currentPath)) {
+//         pathMap.set(currentPath, []);
+//       }
+//
+//       if (parentPath) {
+//         const children = pathMap.get(parentPath) || [];
+//         if (!children.includes(currentPath)) {
+//           children.push(currentPath);
+//           pathMap.set(parentPath, children);
+//         }
+//       }
+//     }
+//
+//     // Add the file to its parent folder
+//     const parentPath = parts.slice(0, parts.length - 1).join('/');
+//     if (parentPath) {
+//       const children = pathMap.get(parentPath) || [];
+//       if (!children.includes(file.path)) {
+//         children.push(file.path);
+//         pathMap.set(parentPath, children);
+//       }
+//     }
+//   });
+//
+//   // Return the original files - the optimization will happen in the TreeFolder component
+//   return files;
+// };
 
 export function DiffTree({ changes }: DiffTreeProps) {
   const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
-  const [processedFiles, setProcessedFiles] = useState<FileChange[]>([]);
+  // const [processedFiles, setProcessedFiles] = useState<FileChange[]>([]);
   const [data, setData] = useState<ChangeModel | undefined | null>();
   const [stats, setStats] = useState({
     additions: 0,
@@ -120,8 +120,8 @@ export function DiffTree({ changes }: DiffTreeProps) {
         setStats(newStats);
 
         // Process files to optimize folder structure
-        const optimizedFiles = optimizeFileStructure(res.files);
-        setProcessedFiles(optimizedFiles);
+        // const optimizedFiles = optimizeFileStructure(res.files);
+        // setProcessedFiles(optimizedFiles);
       })
       .catch(() => {
         setData(null);
@@ -151,7 +151,7 @@ export function DiffTree({ changes }: DiffTreeProps) {
   if (loading || !data) {
     return (
       <div className="space-y-4">
-        <h3 className="text-lg font-medium mb-0">Changes</h3>
+        <h3 className="mb-0 text-lg font-medium">Changes</h3>
 
         <div className="text-sm">
           <div className="mb-4 flex items-center justify-between">
@@ -185,7 +185,7 @@ export function DiffTree({ changes }: DiffTreeProps) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium  mb-0">Changes</h3>
+      <h3 className="mb-0 text-lg  font-medium">Changes</h3>
 
       <div className="text-sm">
         <div className="mb-4 flex items-center justify-between">
@@ -293,6 +293,7 @@ function TreeFolder({ name, files, level, onFileClick, selectedFile }: TreeFolde
   return (
     <div>
       {name !== '/' && (
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events
         <div
           className={`flex cursor-pointer items-center p-2 hover:bg-gray-50`}
           style={{ paddingLeft: `${level * 16 + 8}px` }}
@@ -319,6 +320,7 @@ function TreeFolder({ name, files, level, onFileClick, selectedFile }: TreeFolde
         <>
           {/* Render files in current directory */}
           {currentFiles.map((file, index) => (
+            // eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events
             <div
               key={index}
               className={`flex cursor-pointer items-center p-2 hover:bg-gray-50 ${
@@ -363,6 +365,7 @@ function TreeFolder({ name, files, level, onFileClick, selectedFile }: TreeFolde
               // Render collapsed directory+file as a single item
               const file = dirFiles[0];
               return (
+                // eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events
                 <div
                   key={index}
                   className={`flex cursor-pointer items-center p-2 hover:bg-gray-50 ${

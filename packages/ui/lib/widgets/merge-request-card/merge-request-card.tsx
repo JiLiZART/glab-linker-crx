@@ -226,7 +226,7 @@ export const MergeRequestCard = forwardRef<HTMLDivElement, MergeRequestCardProps
                     <div className="text-muted-foreground text-sm">by {item.author.name}</div>
                     <a href={item.url} target="_blank" rel="noreferrer noopener">
                       <Badge variant="outline" className="ml-2">
-                        !{item.id} <ExternalLink className="inline ml-2 size-3" />
+                        !{item.id} <ExternalLink className="ml-2 inline size-3" />
                       </Badge>
                     </a>
                   </div>
@@ -251,15 +251,15 @@ export const MergeRequestCard = forwardRef<HTMLDivElement, MergeRequestCardProps
               {/*<MergeRequestStats changesCount={mr.ca} hasConflicts={} createdAt={updatedAt} />*/}
             </div>
 
-            <div className="flex flex-row gap-4 mt-2">
+            <div className="mt-2 flex flex-row gap-4">
               {item.reviewers.length > 0 && (
-                <div className="flex flex-row gap-2 mb-1 text-sm text-gray-500">
+                <div className="mb-1 flex flex-row gap-2 text-sm text-gray-500">
                   <AvatarStack users={item.reviewers} maxVisible={3} />
                   Reviewers ({item.reviewers.length})
                 </div>
               )}
               {item.approvers.length > 0 && (
-                <div className="flex flex-row gap-2 mb-1 text-sm text-gray-500">
+                <div className="mb-1 flex flex-row gap-2 text-sm text-gray-500">
                   <AvatarStack users={item.approvers} maxVisible={3} showTooltipNames={true} />
                   Approvals ({item.approvers.length}/{item.requiredApprovals})
                 </div>
@@ -290,7 +290,7 @@ export const MergeRequestCard = forwardRef<HTMLDivElement, MergeRequestCardProps
               <div className="text-xs text-gray-500">Updated {item.updatedAtLocale}</div>
 
               <div className="flex items-center gap-1.5">
-                <GitCommitIcon className="size-3 color-gray-500" />
+                <GitCommitIcon className="color-gray-500 size-3" />
                 <span className="text-xs text-gray-500">{item.changesCount} changes</span>
               </div>
             </div>
